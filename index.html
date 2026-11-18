@@ -252,6 +252,10 @@
   .grid { grid-auto-rows: minmax(120px, 1fr); }
   @media (max-width: 999px), (max-height: 559px) { .grid { grid-auto-rows: minmax(112px, auto); } }
   @media (max-width: 640px) { .grid { grid-auto-rows: minmax(62px, auto); } }
+  .flvs { display: flex; flex-wrap: wrap; gap: 8px; }
+  .flv { display: inline-flex; align-items: center; gap: 8px; border: 1px solid var(--line2); border-radius: 99px; padding: 8px 14px; cursor: pointer; font-size: 14px; color: var(--ink); background: var(--bg); min-height: 40px; }
+  .flv:has(input:checked) { border-color: var(--ink); background: var(--soft); font-weight: 600; }
+  .flv input { width: 18px; height: 18px; margin: 0; accent-color: var(--ink); }
 </style>
 </head>
 <body>
@@ -271,7 +275,7 @@
       <span class="counter" id="cnt" aria-live="polite">0 / 0</span>
       <span class="sep" aria-hidden="true"></span>
       <button class="ib" id="btnEs" aria-pressed="false" aria-label="Solo esenciales" title="Mostrar solo lo esencial"><svg class="i" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button>
-      <button class="ib" id="btnSet" aria-label="Mis datos" title="Mis datos (precio, meta, teléfono…)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      <button class="ib" id="btnSet" aria-label="Mis datos" title="Sabores y datos (precio, meta, teléfono…)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
       <button class="ib" id="btnTheme" aria-label="Cambiar tema" title="Cambiar tema claro / oscuro"></button>
     </div>
   </div>
@@ -298,9 +302,10 @@
 </main>
 
 <dialog id="dlgSet" aria-labelledby="dsT">
-  <div class="dh"><h2 id="dsT">Mis datos</h2><button class="ib" id="dsX" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="dh"><h2 id="dsT">Ajustes</h2><button class="ib" id="dsX" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <div class="db">
-    <p class="hint" style="margin-top:6px">Los textos del calendario usan estos datos. Cámbialos aquí y se actualizan solos en todas las piezas.</p>
+    <p class="hint" style="margin-top:6px">Los textos del calendario usan estos datos. Cámbialos aquí y se actualizan solos en todas las piezas: si marcas varios sabores, los textos dirán «Negro o Habanero»; con uno solo dirán solo ese.</p>
+    <div class="set"><label id="sSaboresL">Sabores que vendes (marca uno o varios)</label><div id="sSabores" class="flvs" role="group" aria-labelledby="sSaboresL"></div><p class="hint" id="sPrev" style="margin:2px 0 0"></p></div>
     <div class="set"><label for="sPrecio">Precio del TostiAguachile</label><input id="sPrecio" type="text" inputmode="text" autocomplete="off"></div>
     <div class="set"><label for="sWa">WhatsApp de pedidos</label><input id="sWa" type="text" inputmode="tel" autocomplete="off"></div>
     <div class="set"><label for="sLugar">Dónde estás</label><input id="sLugar" type="text" autocomplete="off"></div>
@@ -325,7 +330,7 @@ var DAYS = [];      // [{date, items:[{f, p, prio, hora}]}]
 /* ---------- ayudantes ---------- */
 var TAGS = "#tostiaguachiles #aguachiles #mariscos #FoodTokMexico #Texmelucan #SanMartinTexmelucan #Puebla";
 function S(dur, mostrar, decir, pant) { return { dur: dur, mostrar: mostrar, decir: decir, pant: pant }; }
-function D(t) { return t + "\n\n📍 {LUGAR} · {HORARIO}\nTostiAguachile Negro {PRECIO} · Pedidos: {WA}\n\n" + TAGS; }
+function D(t) { return t + "\n\n📍 {LUGAR} · {HORARIO}\nTostiAguachile {SABOR} {PRECIO} · Pedidos: {WA}\n\n" + TAGS; }
 var PLAT_V = "TikTok · Reels de Instagram · Reels de Facebook";
 var PIE_V = [
   "Formato vertical 9:16, con el celular quieto (apóyalo en la hielera) o con las dos manos.",
@@ -338,31 +343,31 @@ function VID(o) { o.t = "video"; o.plat = o.plat || PLAT_V; o.pie = o.pie || PIE
 
 /* ============ 1. Lanzamiento ============ */
 FORMATS.lanzamiento = function () { return VID({
-  nombre: "Lanzamiento: ya llegaron los TostiAguachiles Negros", ev: "a", dur: "18 a 20 s", hora: "Hoy, de 12 a 2 pm o de 7 a 9 pm",
+  nombre: "Lanzamiento: ya llegaron los TostiAguachiles {SABORES}", ev: "a", dur: "18 a 20 s", hora: "Hoy, de 12 a 2 pm o de 7 a 9 pm",
   porque: "Un negocio nuevo anunciado con su dirección fue lo que más alcance tuvo en Texmelucan (195 mil vistas). Este es tu anuncio de “aquí estamos”.",
   necesitas: ["De 3 a 5 clips o fotos que ya tengas: el reel “Algo bien para nuestros clientes”, la bolsa con el tenedor, el letrero de {PRECIO}.", "Editor del celular (CapCut o el de TikTok).", "Opcional: tu voz grabada encima."],
   v: [
-    { e: "Directo", gancho: "¡Texmelucan, ya llegaron los TostiAguachiles Negros!", audio: "Tu voz con música suave de fondo (de la biblioteca de la app).",
+    { e: "Directo", gancho: "¡Texmelucan, ya llegaron los TostiAguachiles {SABORES}!", audio: "Tu voz con música suave de fondo (de la biblioteca de la app).",
       esc: [
-        S("0–3 s", "El clip más llamativo: la bolsa abierta con el tenedor, en primer plano.", "¡Texmelucan, ya llegaron los TostiAguachiles Negros!", "¡YA LLEGARON! 🔥"),
-        S("3–8 s", "Clips del puesto: la hielera, el letrero de {PRECIO}, las bolsas de Tostitos acomodadas.", "Camarón, pepino, cebolla morada y nuestro aderezo negro. Todo preparado al momento.", "Camarón fresco · preparado al momento"),
+        S("0–3 s", "El clip más llamativo: la bolsa abierta con el tenedor, en primer plano.", "¡Texmelucan, ya llegaron los TostiAguachiles {SABORES}!", "¡YA LLEGARON! 🔥"),
+        S("3–8 s", "Clips del puesto: la hielera, el letrero de {PRECIO}, las bolsas de Tostitos acomodadas.", "Camarón, pepino, cebolla morada y {NUESTRO_ADEREZO}. Todo preparado al momento.", "Camarón fresco · preparado al momento"),
         S("8–13 s", "Manos echando el aderezo y el ajonjolí sobre la bolsa (cámara lenta si puedes).", "Normales o picantes, tú escoges.", "Normales o picantes"),
         S("13–19 s", "El letrero de {PRECIO} y una toma del lugar para que lo reconozcan.", "{PRECIO}. Estamos {LUGAR}, {HORARIO}.", "{PRECIO} · 📍 {LUGAR}")],
-      desc: D("¡Texmelucan, ya llegaron los TostiAguachiles Negros! 🔥 Normales o picantes, preparados al momento."), fijado: "¿Normales o picantes? 👇" },
-    { e: "Con humor", gancho: "Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida? 😅", audio: "Tu voz, sin música. Un sonido gracioso de la app si quieres en el corte.",
+      desc: D("¡Texmelucan, ya llegaron los TostiAguachiles {SABORES}! 🔥 Normales o picantes, preparados al momento."), fijado: "¿Normales o picantes? 👇" },
+    { e: "Con humor", gancho: "Si todavía no has probado un TostiAguachile {SABOR}… ¿qué haces con tu vida? 😅", audio: "Tu voz, sin música. Un sonido gracioso de la app si quieres en el corte.",
       esc: [
-        S("0–3 s", "Tú, serio, mirando a cámara con una bolsa cerrada en la mano.", "Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida?", "¿Qué haces con tu vida? 😅"),
+        S("0–3 s", "Tú, serio, mirando a cámara con una bolsa cerrada en la mano.", "Si todavía no has probado un TostiAguachile {SABOR}… ¿qué haces con tu vida?", "¿Qué haces con tu vida? 😅"),
         S("3–7 s", "Corte rápido: abres la bolsa de golpe y aparece todo el aguachile.", "Porque en Texmelucan ya llegaron.", "YA LLEGARON"),
-        S("7–13 s", "Pepino, camarón y cebolla cayendo sobre las papas, cortes de un segundo.", "Camarón, pepino, cebolla morada… y ese aderezo negro que no perdona.", "Aderezo negro 🖤"),
+        S("7–13 s", "Pepino, camarón y cebolla cayendo sobre las papas, cortes de un segundo.", "Camarón, pepino, cebolla morada… y {NUESTRO_ADEREZO}, lo que se te queda en la memoria.", "{ADEREZO_C} {EMOJI}"),
         S("13–19 s", "Das el primer bocado a cámara y cierras los ojos.", "{PRECIO}. {LUGAR}, {HORARIO}. Y ya.", "{PRECIO} · 📍 {LUGAR}")],
-      desc: D("Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida? 😅"), fijado: "Cuéntanos: ¿normal o picante? 🔥" },
+      desc: D("Si todavía no has probado un TostiAguachile {SABOR}… ¿qué haces con tu vida? 😅"), fijado: "Cuéntanos: ¿normal o picante? 🔥" },
     { e: "Cercano", gancho: "Vecinos de Texmelucan: ya estamos aquí 👋", audio: "Tu voz tranquila, sin música o con música muy bajita.",
       esc: [
         S("0–3 s", "Tú saludando a cámara, con el puesto detrás.", "Vecinos de Texmelucan, ya estamos aquí.", "Ya estamos aquí 👋"),
         S("3–8 s", "Muestras el puesto completo, despacio, de izquierda a derecha.", "Somos Aguachiliando y venimos a prepararte el antojo del fin de semana.", "Aguachiliando"),
-        S("8–14 s", "Preparas una bolsa con calma, plano cerrado de tus manos.", "Camarón fresquecito, pepino, cebolla y nuestra salsa negra. Hecho al momento y con cariño.", "Hecho al momento"),
+        S("8–14 s", "Preparas una bolsa con calma, plano cerrado de tus manos.", "Camarón fresquecito, pepino, cebolla y {NUESTRO_ADEREZO}. Hecho al momento y con cariño.", "Hecho al momento"),
         S("14–20 s", "Entregas la bolsa a una persona (con su permiso) y sonríes.", "Te esperamos {LUGAR}, {HORARIO}. Ven por el tuyo.", "📍 {LUGAR}")],
-      desc: D("Vecinos de Texmelucan, ya estamos aquí 👋 Ven por tu TostiAguachile Negro."), fijado: "¿Ya sabías que estábamos aquí? 👇" }
+      desc: D("Vecinos de Texmelucan, ya estamos aquí 👋 Ven por tu TostiAguachile {SABOR}."), fijado: "¿Ya sabías que estábamos aquí? 👇" }
   ] }); };
 
 /* ============ 2. Ya abrimos (cada viernes) ============ */
@@ -374,14 +379,14 @@ FORMATS.ya_abrimos = function (p) { var nota = p.nota || ""; return VID({
     { e: "Directo", gancho: "Ya abrimos.", audio: "Música animada de fondo, tu voz arriba.",
       esc: [
         S("0–2 s", "Tu mano levantando la tapa de la hielera (plano cerrado, luz del día).", "Ya abrimos.", "YA ABRIMOS 🔥"),
-        S("2–6 s", "Giro rápido por el puesto armado: letrero, salsas, bolsas de Tostitos.", "Viernes de TostiAguachile Negro.", "📍 {LUGAR}"),
+        S("2–6 s", "Giro rápido por el puesto armado: letrero, salsas, bolsas de Tostitos.", "Viernes de TostiAguachile {SABOR}.", "📍 {LUGAR}"),
         S("6–11 s", "Armas una bolsa de principio a fin en cortes rápidos: abrir, camarón, pepino, cebolla, aderezo.", "Camarón fresco, preparado al momento.", "Preparado al momento"),
         S("11–15 s", "Entregas la bolsa a cámara con el tenedor.", "Aquí te esperamos. " + nota, "{PRECIO} · {HORARIO}")],
       desc: D("Ya abrimos 🔥 " + nota), fijado: "¿Quién viene hoy? 🙋" },
     { e: "Con humor", gancho: "Alerta: se abrió el antojo.", audio: "Un sonido de “alerta” de la app al inicio, luego tu voz.",
       esc: [
         S("0–2 s", "Plano de tu cara muy cerca, con ojos grandes.", "Alerta: se abrió el antojo.", "🚨 SE ABRIÓ EL ANTOJO"),
-        S("2–6 s", "Quitas la tapa de la hielera de golpe y sale “vapor” de frío (o solo la abres rápido).", "Ya hay camarón, ya hay aderezo negro y ya hay Tostitos.", "Todo listo"),
+        S("2–6 s", "Quitas la tapa de la hielera de golpe y sale “vapor” de frío (o solo la abres rápido).", "Ya hay camarón, ya hay {ADEREZO} y ya hay Tostitos.", "Todo listo"),
         S("6–11 s", "Cierras con una bolsa servida en primer plano, la giras para que se vea.", "Y tú, ¿qué estás esperando?", "¿Y tú? 👀"),
         S("11–15 s", "Señalas hacia abajo hacia el texto.", "Frente a la UIEST, hasta las tres. " + nota, "{PRECIO} · 📍 {LUGAR}")],
       desc: D("🚨 Alerta: se abrió el antojo. " + nota), fijado: "Avísale al que te debe un aguachile 😏" },
@@ -435,7 +440,7 @@ FORMATS.domingo = function (p) { var nota = p.nota || ""; return VID({
     { e: "Con humor", gancho: "Si no alcanzaste, esto es lo que te perdiste.", audio: "Tu voz con tono de “qué lástima”.",
       esc: [
         S("0–3 s", "Metes la mano a la hielera vacía y sacas aire.", "Si no alcanzaste, esto es lo que te perdiste.", "Lo que te perdiste 😢"),
-        S("3–9 s", "Cortes de bolsas servidas de hoy, una tras otra.", "Camarón, pepino, aderezo negro… se fue todo.", "Se fue todo"),
+        S("3–9 s", "Cortes de bolsas servidas de hoy, una tras otra.", "Camarón, pepino, {ADEREZO}… se fue todo.", "Se fue todo"),
         S("9–13 s", "Tú señalando el calendario con el dedo.", "El viernes llegamos a las once. Corre. " + nota, "Viernes 11 am ⏰")],
       desc: D("Si no alcanzaste hoy… el viernes llegamos a las 11 🏃 " + nota), fijado: "¿Alcanzaste o te quedaste con las ganas? 😅" },
     { e: "Cercano", gancho: "Qué bonito domingo, gracias, Texmelucan.", audio: "Tu voz tranquila.",
@@ -463,7 +468,7 @@ FORMATS.costos = function () { return VID({
       esc: [
         S("0–4 s", "Tú a cámara con el recibo en la mano.", "Gasté ochocientos pesos en camarón. Adivina cuántos aguachiles salen.", "¿Cuántos salen? 🤔"),
         S("4–9 s", "Cuenta regresiva en pantalla, con música de suspenso.", "Piénsalo… tic, tac…", "3… 2… 1…"),
-        S("9–16 s", "Muestras la calculadora y el resultado.", "Unos veintidós. Sí, con todo y aderezo negro.", "≈ 22 aguachiles 🎉"),
+        S("9–16 s", "Muestras la calculadora y el resultado.", "Unos veintidós. Sí, con todo y {ADEREZO}.", "≈ 22 aguachiles 🎉"),
         S("16–22 s", "Sirves una bolsa y la giras.", "Ahora ya sabes por qué cada uno vale ciento veinte.", "{PRECIO} · 📍 {LUGAR}")],
       desc: D("¿Adivinaste? 5 kg de camarón = unos 22 aguachiles 🦐"), fijado: "Pon tu número en comentarios antes de ver el video 👇" },
     { e: "Cercano", gancho: "Les cuento cuánto cuesta hacer lo que les vendo.", audio: "Tu voz natural, sin música.",
@@ -485,7 +490,7 @@ FORMATS.asmr = function (p) { var f = p.foco || "picar pepino y exprimir limón"
       esc: [
         S("0–3 s", "Primerísimo plano de: " + f + ". El primer sonido debe ser fuerte y claro.", "(sin voz)", "🔊 Ponle volumen"),
         S("3–10 s", "Cortes rápidos de lo mismo desde otros ángulos, siempre de cerca.", "(sin voz)", ""),
-        S("10–14 s", "Un plano de la bolsa servida, con el aderezo cayendo despacio.", "(sin voz)", "TostiAguachile Negro · 📍 {LUGAR}")],
+        S("10–14 s", "Un plano de la bolsa servida, con el aderezo cayendo despacio.", "(sin voz)", "TostiAguachile {SABOR} · 📍 {LUGAR}")],
       desc: D("Sube el volumen 🔊 " + f + "."), fijado: "¿Ya tienes hambre? 🤤" },
     { e: "Susurrado", gancho: "(En voz baja) Esto es lo que estás oyendo.", audio: "Tu voz muy bajita, como susurro, sobre el sonido.",
       esc: [
@@ -497,7 +502,7 @@ FORMATS.asmr = function (p) { var f = p.foco || "picar pepino y exprimir limón"
       esc: [
         S("0–3 s", "Plano muy cercano de: " + f + ", con el primer corte justo en el primer golpe de música.", "(sin voz)", "🔥"),
         S("3–10 s", "Cortes rápidos cada medio segundo: ingredientes, manos, bolsa.", "(sin voz)", ""),
-        S("10–14 s", "Bolsa lista con el aderezo cayendo.", "(sin voz)", "TostiAguachile Negro {PRECIO}")],
+        S("10–14 s", "Bolsa lista con el aderezo cayendo.", "(sin voz)", "TostiAguachile {SABOR} {PRECIO}")],
       desc: D("Al ritmo del antojo 🎶 " + f + "."), fijado: "Etiqueta a quien invitarías 🙌" }
   ] }); };
 
@@ -540,7 +545,7 @@ FORMATS.curiosidad_bolsa = function () { return VID({
       esc: [
         S("0–3 s", "La bolsa cerrada en tu mano, cerca de cámara.", "¿Unos Tostitos preparados o qué?", "¿Tostitos preparados? 🤔"),
         S("3–8 s", "Rompes la bolsa por arriba y ya viene lleno de aguachile.", "Mira nada más.", "Mira nada más 🔥"),
-        S("8–12 s", "Primer plano de la bolsa con el aderezo.", "TostiAguachile Negro. {PRECIO}.", "{PRECIO} · 📍 {LUGAR}")],
+        S("8–12 s", "Primer plano de la bolsa con el aderezo.", "TostiAguachile {SABOR}. {PRECIO}.", "{PRECIO} · 📍 {LUGAR}")],
       desc: D("¿Unos Tostitos preparados o qué? 🔥"), fijado: "¿Normales o picantes? 👇" },
     { e: "Con humor", gancho: "Me dijeron que eran unos Tostitos normales.", audio: "Tu voz, tono de sorpresa.",
       esc: [
@@ -558,13 +563,13 @@ FORMATS.curiosidad_bolsa = function () { return VID({
 
 /* ============ 9. Primera vez probando ============ */
 FORMATS.primera_vez = function () { return VID({
-  nombre: "Su primera vez probando un TostiAguachile Negro", ev: "i", dur: "12 a 15 s", hora: "7 a 9 pm",
+  nombre: "Su primera vez probando un TostiAguachile {SABOR}", ev: "i", dur: "12 a 15 s", hora: "7 a 9 pm",
   porque: "Las reseñas de primera vez son de los formatos más repetidos en TikTok con tostiaguachile (búsqueda web, sin métricas propias).",
   necesitas: ["Un cliente que acepte salir en el video: pídele permiso antes de grabar.", "Pídele que diga lo primero que sienta, sin prepararlo."],
   v: [
-    { e: "Directo", gancho: "Su primera vez con un TostiAguachile Negro.", audio: "Sonido real, con música muy bajita.",
+    { e: "Directo", gancho: "Su primera vez con un TostiAguachile {SABOR}.", audio: "Sonido real, con música muy bajita.",
       esc: [
-        S("0–3 s", "El cliente con la bolsa recién entregada, a cámara.", "Su primera vez con un TostiAguachile Negro.", "Primera vez 😳"),
+        S("0–3 s", "El cliente con la bolsa recién entregada, a cámara.", "Su primera vez con un TostiAguachile {SABOR}.", "Primera vez 😳"),
         S("3–9 s", "Primer bocado, cámara en su cara.", "(Que diga lo que sienta.)", "Reacción real"),
         S("9–14 s", "Su veredicto a cámara.", "Y tú, ¿ya lo probaste?", "📍 {LUGAR} · {PRECIO}")],
       desc: D("Su primera vez 😳🔥"), fijado: "¿Cuál fue tu reacción la primera vez? 👇" },
@@ -640,23 +645,23 @@ FORMATS.que_lleva = function () { return VID({
   porque: "Mostrar qué trae lo que vendes (precio y porción) es el formato más común en TikTok con tostiaguachile.",
   necesitas: ["Los ingredientes de tu receta real, cada uno por separado en un plato o charola (ajusta la lista del video a lo que de verdad lleva).", "Un fondo limpio (mesa o tabla)."],
   v: [
-    { e: "Directo", gancho: "Esto es lo que trae un TostiAguachile Negro.", audio: "Tu voz con música suave.",
+    { e: "Directo", gancho: "Esto es lo que trae un TostiAguachile {SABOR}.", audio: "Tu voz con música suave.",
       esc: [
-        S("0–3 s", "Todos los ingredientes en fila sobre la mesa, vista desde arriba.", "Esto es lo que trae un TostiAguachile Negro.", "¿Qué trae? 🧐"),
-        S("3–14 s", "Vas señalando cada ingrediente con el dedo, uno por uno.", "Camarón. Pepino. Cebolla morada. Limón. Aguacate. Aderezo negro. Ajonjolí. Y las papas.", "(el nombre de cada uno)"),
+        S("0–3 s", "Todos los ingredientes en fila sobre la mesa, vista desde arriba.", "Esto es lo que trae un TostiAguachile {SABOR}.", "¿Qué trae? 🧐"),
+        S("3–14 s", "Vas señalando cada ingrediente con el dedo, uno por uno.", "Camarón. Pepino. Cebolla morada. Limón. Aguacate. {ADEREZO_C}. Ajonjolí. Y las papas.", "(el nombre de cada uno)"),
         S("14–20 s", "Armas la bolsa sin cortes, rápido.", "Todo preparado al momento.", "Preparado al momento"),
         S("20–24 s", "La bolsa servida a cámara.", "{PRECIO}. {LUGAR}.", "{PRECIO} · 📍 {LUGAR}")],
-      desc: D("Esto es lo que trae tu TostiAguachile Negro 🦐"), fijado: "¿Qué le agregarías tú? 👇" },
+      desc: D("Esto es lo que trae tu TostiAguachile {SABOR} 🦐"), fijado: "¿Qué le agregarías tú? 👇" },
     { e: "Con humor", gancho: "¿Qué lleva? Todo lo bueno de la vida.", audio: "Tu voz, tono de presentador.",
       esc: [
-        S("0–3 s", "Tú presentando la mesa como en un programa.", "¿Qué lleva un TostiAguachile Negro? Todo lo bueno de la vida.", "Todo lo bueno 😎"),
-        S("3–15 s", "Señalas cada ingrediente con ritmo (puedes poner un “ding” por cada uno).", "Camarón, ¡ding! Pepino, ¡ding! Cebolla morada, ¡ding! Aguacate, ¡ding! Aderezo negro, ¡ding!", "ding ✨"),
+        S("0–3 s", "Tú presentando la mesa como en un programa.", "¿Qué lleva un TostiAguachile {SABOR}? Todo lo bueno de la vida.", "Todo lo bueno 😎"),
+        S("3–15 s", "Señalas cada ingrediente con ritmo (puedes poner un “ding” por cada uno).", "Camarón, ¡ding! Pepino, ¡ding! Cebolla morada, ¡ding! Aguacate, ¡ding! {ADEREZO_C}, ¡ding!", "ding ✨"),
         S("15–21 s", "Armas la bolsa mientras suena música.", "Y lo mejor: lo armamos frente a ti.", "En vivo"),
         S("21–25 s", "Muestras la bolsa terminada.", "{PRECIO}. Ven por el tuyo.", "📍 {LUGAR}")],
       desc: D("¿Qué lleva? Todo lo bueno 😎"), fijado: "¿Cuál es tu ingrediente favorito? 👇" },
     { e: "Cercano", gancho: "Les cuento qué lleva y por qué cuesta {PRECIO}.", audio: "Tu voz natural, sin música.",
       esc: [
-        S("0–5 s", "Tú, con los ingredientes al frente, a cámara.", "Les cuento qué lleva un TostiAguachile Negro y por qué cuesta {PRECIO}.", "¿Por qué {PRECIO}?"),
+        S("0–5 s", "Tú, con los ingredientes al frente, a cámara.", "Les cuento qué lleva un TostiAguachile {SABOR} y por qué cuesta {PRECIO}.", "¿Por qué {PRECIO}?"),
         S("5–17 s", "Muestras cada ingrediente mientras explicas.", "El camarón es fresco y es lo más caro. El pepino y la cebolla los picamos ese día, y el aderezo es nuestro.", "Fresco · picado ese día"),
         S("17–22 s", "Armas la bolsa con calma.", "Todo junto en una bolsa de Tostitos, normal o picante.", "Normal o picante"),
         S("22–25 s", "Sonríes y la entregas.", "Te esperamos {LUGAR}.", "📍 {LUGAR}")],
@@ -975,26 +980,26 @@ FORMATS.flyer_sorteo = function (p) { var fecha = p.fecha || "el domingo"; retur
   v: [
     { e: "Directo", prompt: REF("el texto principal por «SORTEO: 2 TOSTIAGUACHILES» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte esta publicación · Etiqueta a 2 amigos · Gana " + fecha + "». No agregues más texto."),
       texto: ["SORTEO: 2 TOSTIAGUACHILES", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana " + fecha],
-      desc: D("🎁 SORTEO: 2 TostiAguachiles Negros\nPara participar: 1) Sigue la cuenta 2) Comparte esta publicación 3) Etiqueta a 2 amigos en los comentarios.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta aquí a tus 2 amigos 👇" },
+      desc: D("🎁 SORTEO: 2 TostiAguachiles {SABORES}\nPara participar: 1) Sigue la cuenta 2) Comparte esta publicación 3) Etiqueta a 2 amigos en los comentarios.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta aquí a tus 2 amigos 👇" },
     { e: "Con humor", prompt: REF("el texto principal por «TE REGALAMOS DOS AGUACHILES (SÍ, GRATIS)» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte · Etiqueta a 2 amigos · Gana " + fecha + "»."),
       texto: ["TE REGALAMOS DOS AGUACHILES (SÍ, GRATIS)", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana " + fecha],
-      desc: D("🎁 Te regalamos 2 TostiAguachiles Negros. Sí, gratis. 😅\nPara participar: sigue la cuenta, comparte y etiqueta a 2 amigos.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta a tu mejor amigo para el aguachile 👇" },
+      desc: D("🎁 Te regalamos 2 TostiAguachiles {SABORES}. Sí, gratis. 😅\nPara participar: sigue la cuenta, comparte y etiqueta a 2 amigos.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta a tu mejor amigo para el aguachile 👇" },
     { e: "Cercano", prompt: REF("el texto principal por «Queremos regalarte un antojo 🧡» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte · Etiqueta a 2 amigos · Gana 2 TostiAguachiles " + fecha + "»."),
       texto: ["Queremos regalarte un antojo 🧡", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana 2 TostiAguachiles " + fecha],
-      desc: D("Queremos regalarte un antojo 🧡 Sorteo de 2 TostiAguachiles Negros.\nSigue la cuenta, comparte y etiqueta a 2 amigos. Elegimos ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Mucha suerte a todos 🍀" }
+      desc: D("Queremos regalarte un antojo 🧡 Sorteo de 2 TostiAguachiles {SABORES}.\nSigue la cuenta, comparte y etiqueta a 2 amigos. Elegimos ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Mucha suerte a todos 🍀" }
   ] }); };
 
 /* ============ Foto: la bolsa en primer plano ============ */
 FORMATS.foto_comp = function () { return FOT({
-  nombre: "Foto: tu TostiAguachile Negro en primer plano", ev: "i", hora: "12 a 2 pm",
+  nombre: "Foto: tu TostiAguachile {SABOR} en primer plano", ev: "i", hora: "12 a 2 pm",
   porque: "En Instagram y Facebook la foto de la bolsa abierta es lo que la gente guarda y comparte (tu foto “Algo bien” tuvo 9 compartidos). Necesitas buena foto para el perfil, Marketplace y los anuncios.",
   subir: "Sube 1 imagen: tu foto real de la bolsa (no la edites con IA si quedó bien).",
   necesitas: ["Una bolsa recién armada, con todos los ingredientes bien acomodados.", "Un lugar con luz natural (a un lado del puesto, sin sol directo en la comida)."],
   v: [
-    { e: "Desde arriba", tomar: "Pon la bolsa abierta sobre una mesa limpia. Párate encima y toma la foto desde arriba, recta. Que se vean el camarón, el pepino, la cebolla morada y el aderezo negro. Deja un poco de espacio libre arriba para escribir.",
+    { e: "Desde arriba", tomar: "Pon la bolsa abierta sobre una mesa limpia. Párate encima y toma la foto desde arriba, recta. Que se vean el camarón, el pepino, la cebolla morada y {EL_ADEREZO}. Deja un poco de espacio libre arriba para escribir.",
       prompt: "Usa la imagen de referencia (mi foto). No cambies la comida, ni la bolsa, ni los ingredientes, ni el logo. Ahora cámbiale: solo la luz (más natural y cálida) y quita las cosas del fondo que distraigan. Mantén el formato vertical 4:5.",
-      texto: ["TostiAguachile Negro", "{PRECIO} · {LUGAR}"],
-      desc: D("Así se ve un TostiAguachile Negro por dentro 🦐🖤"), fijado: "¿Normal o picante? 👇" },
+      texto: ["TostiAguachile {SABOR}", "{PRECIO} · {LUGAR}"],
+      desc: D("Así se ve un TostiAguachile {SABOR} por dentro 🦐{EMOJI}"), fijado: "¿Normal o picante? 👇" },
     { e: "En la mano", tomar: "Pídele a alguien que te tome la foto, o apóyate en la hielera. Sostén la bolsa con una mano a la altura del pecho, un poco inclinada hacia la cámara, con el tenedor dentro. El fondo debe ser el puesto.",
       prompt: "Usa la imagen de referencia (mi foto). No cambies la comida, la bolsa, la mano ni el logo. Ahora cámbiale: solo la luz (más natural y cálida) y desenfoca ligeramente el fondo. Mantén el formato vertical 4:5.",
       texto: ["Hecho al momento", "{LUGAR}"],
@@ -1013,7 +1018,7 @@ FORMATS.historias_viernes = function () { return HIS({
   v: [
     { e: "Directo", lams: [
       { hora: "10:30 am", mostrar: "Foto o video corto del puesto ya armado, con el letrero de {PRECIO}.", texto: "YA ABRIMOS 🔥", sticker: "Ubicación: {LUGAR}" },
-      { hora: "12 pm", mostrar: "Una bolsa servida, de cerca.", texto: "TostiAguachile Negro · {PRECIO}", sticker: "Pregunta: “¿Normal o picante?”" },
+      { hora: "12 pm", mostrar: "Una bolsa servida, de cerca.", texto: "TostiAguachile {SABOR} · {PRECIO}", sticker: "Pregunta: “¿Normal o picante?”" },
       { hora: "2 pm", mostrar: "El puesto con gente o con la hielera casi vacía.", texto: "Quedan pocos ⏳ Hasta las 3", sticker: "Ubicación: {LUGAR}" }] },
     { e: "Con humor", lams: [
       { hora: "10:30 am", mostrar: "Selfie tuya con cara de “ya llegué”.", texto: "Sí, ya abrí. Sí, hay camarón. 😎", sticker: "Ubicación: {LUGAR}" },
@@ -1067,16 +1072,16 @@ FORMATS.historia_encuesta = function () { return HIS({
 
 /* ============ Marketplace ============ */
 FORMATS.marketplace = function () { return MKT({
-  nombre: "Marketplace: publica tu TostiAguachile Negro", ev: "i", hora: "12 a 2 pm",
+  nombre: "Marketplace: publica tu TostiAguachile {SABOR}", ev: "i", hora: "12 a 2 pm",
   porque: "En tu zona hay TostiAguachiles en Marketplace entre $100 y $165. El tuyo ($120) está en un rango normal. Pruébalo 2 semanas y decide con los mensajes que recibas.",
   necesitas: ["3 a 5 fotos (la bolsa de cerca, el puesto, el letrero).", "Que tu perfil de Facebook (no la página) esté a tu nombre y con foto."],
   v: [
-    { e: "Directo", titulo: "TostiAguachile Negro con camarón fresco", precio: "{PRECIO}", cat: "Comida / Otros",
-      desc: "TostiAguachile Negro: camarón fresco, pepino, cebolla morada, limón, aguacate y nuestro aderezo negro sobre Tostitos (normales o picantes).\n\nHecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nPedidos por WhatsApp: {WA}" },
+    { e: "Directo", titulo: "TostiAguachile {SABOR} con camarón fresco", precio: "{PRECIO}", cat: "Comida / Otros",
+      desc: "TostiAguachile {SABOR}: camarón fresco, pepino, cebolla morada, limón, aguacate y {NUESTRO_ADEREZO} sobre Tostitos (normales o picantes).\n\nHecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nPedidos por WhatsApp: {WA}" },
     { e: "Con humor", titulo: "Aguachile en bolsa de Tostitos (sí, funciona)", precio: "{PRECIO}", cat: "Comida / Otros",
-      desc: "¿Aguachile en una bolsa de Tostitos? Sí. Y no te lo vas a poder sacar de la cabeza. 😅\n\nCamarón fresco, pepino, cebolla morada y aderezo negro. Hecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nWhatsApp: {WA}" },
-    { e: "Cercano", titulo: "TostiAguachile Negro, hecho al momento y con cariño", precio: "{PRECIO}", cat: "Comida / Otros",
-      desc: "Hola, somos Aguachiliando 🧡 Preparamos cada TostiAguachile Negro en el momento, con camarón fresco, pepino, cebolla morada y nuestro aderezo negro.\n\nNos encuentras en {LUGAR}, {HORARIO}.\nTambién hacemos envíos en San Martín y Texmelucan centro.\nEscríbenos por WhatsApp: {WA}" }
+      desc: "¿Aguachile en una bolsa de Tostitos? Sí. Y no te lo vas a poder sacar de la cabeza. 😅\n\nCamarón fresco, pepino, cebolla morada y {ADEREZO}. Hecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nWhatsApp: {WA}" },
+    { e: "Cercano", titulo: "TostiAguachile {SABOR}, hecho al momento y con cariño", precio: "{PRECIO}", cat: "Comida / Otros",
+      desc: "Hola, somos Aguachiliando 🧡 Preparamos cada TostiAguachile {SABOR} en el momento, con camarón fresco, pepino, cebolla morada y {NUESTRO_ADEREZO}.\n\nNos encuentras en {LUGAR}, {HORARIO}.\nTambién hacemos envíos en San Martín y Texmelucan centro.\nEscríbenos por WhatsApp: {WA}" }
   ] }); };
 
 /* ============ Tareas (con textos en 3 estilos cuando hay texto) ============ */
@@ -1086,9 +1091,9 @@ var TAREAS = {
     porque: "En la bio de Facebook dice “11PM a 3 PM”: quien lea eso pensará que abres de noche. Es lo primero que ve alguien nuevo.",
     pasos: ["Abre tu página de Facebook → Editar información de la página → Horario.", "Escribe: viernes, sábado y domingo de 11:00 am a 3:00 pm.", "Pega la bio que más te guste (abajo) en Facebook y en Instagram.", "Instagram: Editar perfil → Biografía. Pon el enlace de WhatsApp o de tu página en “Enlaces”."],
     v: [
-      { e: "Directo", items: [{ lbl: "Bio", txt: "TostiAguachile Negro {PRECIO} 🦐🖤\n📍 {LUGAR}\n🕐 {HORARIO}\n📲 Pedidos y envíos: {WA}" }] },
+      { e: "Directo", items: [{ lbl: "Bio", txt: "TostiAguachile {SABOR} {PRECIO} 🦐{EMOJI}\n📍 {LUGAR}\n🕐 {HORARIO}\n📲 Pedidos y envíos: {WA}" }] },
       { e: "Con humor", items: [{ lbl: "Bio", txt: "Aguachile en bolsa de Tostitos 🦐 (sí, funciona)\n📍 {LUGAR} · {HORARIO}\n📲 {WA}" }] },
-      { e: "Cercano", items: [{ lbl: "Bio", txt: "Hecho al momento y con cariño 🧡\nTostiAguachile Negro {PRECIO}\n📍 {LUGAR} · {HORARIO}\n📲 {WA}" }] }
+      { e: "Cercano", items: [{ lbl: "Bio", txt: "Hecho al momento y con cariño 🧡\nTostiAguachile {SABOR} {PRECIO}\n📍 {LUGAR} · {HORARIO}\n📲 {WA}" }] }
     ] }); },
   fijar: function () { return TAR({
     nombre: "Fija el mejor video y ordena los destacados", ev: "t", hora: "Cuando puedas",
@@ -1106,7 +1111,7 @@ var TAREAS = {
     v: [
       { e: "Directo", items: [
         { lbl: "¿Dónde están?", txt: "Estamos {LUGAR}. {HORARIO}." },
-        { lbl: "¿Cuánto cuesta?", txt: "El TostiAguachile Negro cuesta {PRECIO}." },
+        { lbl: "¿Cuánto cuesta?", txt: "El TostiAguachile {SABOR} cuesta {PRECIO}." },
         { lbl: "¿Hacen envíos?", txt: "Sí, en San Martín y Texmelucan centro. Pide por WhatsApp: {WA}." },
         { lbl: "¿Cuándo abren?", txt: "{HORARIO}." }] },
       { e: "Con humor", items: [
@@ -1116,7 +1121,7 @@ var TAREAS = {
         { lbl: "¿Cuándo abren?", txt: "{HORARIO}. Ve apartando el hambre." }] },
       { e: "Cercano", items: [
         { lbl: "¿Dónde están?", txt: "¡Hola! Estamos {LUGAR}. Te esperamos, {HORARIO} 🧡" },
-        { lbl: "¿Cuánto cuesta?", txt: "¡Hola! El TostiAguachile Negro cuesta {PRECIO}. ¿Te animas? 🧡" },
+        { lbl: "¿Cuánto cuesta?", txt: "¡Hola! El TostiAguachile {SABOR} cuesta {PRECIO}. ¿Te animas? 🧡" },
         { lbl: "¿Hacen envíos?", txt: "¡Sí! Hacemos envíos en San Martín y Texmelucan centro. Escríbenos al {WA} y te ayudamos 🧡" },
         { lbl: "¿Cuándo abren?", txt: "Abrimos {HORARIO}. ¡Te esperamos! 🧡" }] }
     ] }); },
@@ -1171,7 +1176,7 @@ DAYS = [
   { d: "2026-11-30", nota: "Lunes de números. Revisa qué video funcionó mejor.",
     items: [I("curiosidad_bolsa", "es"), I("tareas", "ta", { k: "medir" })] },
   { d: "2026-12-01", nota: "Empieza diciembre. Sonido real otra vez, ahora con el aderezo.",
-    items: [I("asmr", "es", { foco: "echar el aderezo negro" }), I("historia_encuesta", "ex")] },
+    items: [I("asmr", "es", { foco: "echar {EL_ADEREZO}" }), I("historia_encuesta", "ex")] },
   { d: "2026-12-02", nota: "Muestra el trabajo detrás del puesto: da confianza.",
     items: [I("detras", "es"), I("tareas", "ta", { k: "mk_revisar" })] },
   { d: "2026-12-03", nota: "Mañana abres y lanzas el sorteo del fin de semana.",
@@ -1241,10 +1246,30 @@ DAYS = [
   function isOpen(s) { var w = pd(s).getDay(); return w === 5 || w === 6 || w === 0; }
   function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
 
+  /* ---------- sabores (variable que reemplaza «Negro» en todos los textos) ---------- */
+  var SABORES = [
+    { id: "negro", n: "Negro", pl: "Negros", ad: "aderezo negro", art: "el aderezo negro", nu: "nuestro aderezo negro", emoji: "🖤" },
+    { id: "chiltepin", n: "Chiltepín", pl: "Chiltepín", ad: "salsa de chiltepín", art: "la salsa de chiltepín", nu: "nuestra salsa de chiltepín", emoji: "🔥" },
+    { id: "habanero", n: "Habanero", pl: "Habanero", ad: "salsa de habanero", art: "la salsa de habanero", nu: "nuestra salsa de habanero", emoji: "🌶️" }
+  ];
+  function activeSabores() {
+    var ids = Array.isArray(st.cfg.sabores) ? st.cfg.sabores : null;
+    var list = SABORES.filter(function (x) { return !ids || ids.indexOf(x.id) >= 0; });
+    return list.length ? list : [SABORES[0]];
+  }
+  function joinEs(a, conj) { return a.length < 2 ? (a[0] || "") : a.slice(0, -1).join(", ") + " " + conj + " " + a[a.length - 1]; }
+  function saborTokens() {
+    var a = activeSabores(), one = a.length === 1 ? a[0] : null;
+    var ad = one ? one.ad : "salsa de la casa";
+    return { SABOR: joinEs(a.map(function (x) { return x.n; }), "o"), SABORES: joinEs(a.map(function (x) { return x.pl; }), "y"),
+      ADEREZO: ad, ADEREZO_C: cap(ad), EL_ADEREZO: one ? one.art : "la salsa de la casa", NUESTRO_ADEREZO: one ? one.nu : "nuestras salsas", EMOJI: one ? one.emoji : "🔥" };
+  }
+
   function tok(s) {
     var meta = Math.max(1, parseInt(cfg("meta"), 10) || 1), n = Math.max(0, parseInt(cfg("n"), 10) || 0);
     var m = { PRECIO: cfg("precio"), WA: cfg("wa"), LUGAR: cfg("lugar"), HORARIO: cfg("horario"), META: meta, N: n, FALTAN: Math.max(0, meta - n), PCT: Math.min(100, Math.round(n / meta * 100)) };
-    return String(s).replace(/\{([A-Z]+)\}/g, function (a, k) { return m.hasOwnProperty(k) ? m[k] : a; });
+    var sb = saborTokens(); for (var k in sb) m[k] = sb[k];
+    return String(s).replace(/\{([A-Z_]+)\}/g, function (a, k) { return m.hasOwnProperty(k) ? m[k] : a; });
   }
 
   /* piezas de cada día (se construyen una sola vez) */
@@ -1439,11 +1464,11 @@ DAYS = [
       });
     } else if (el.hasAttribute("data-day")) { selectDay(el.getAttribute("data-day")); }
     else if (el.hasAttribute("data-piece")) { S.piece = +el.getAttribute("data-piece"); S.v = 0; renderPiece(true); }
-    else if (el.hasAttribute("data-done")) { var pc = BY[S.day].pieces[+el.getAttribute("data-done")]; st.done[pc.key] = !st.done[pc.key]; if (!st.done[pc.key]) delete st.done[pc.key]; save(); var sy = panel.querySelector(".body"); var keep = sy ? sy.scrollTop : 0; renderAll(); var nb = panel.querySelector(".body"); if (nb) nb.scrollTop = keep; }
+    else if (el.hasAttribute("data-done")) { var y0 = window.pageYOffset; var pc = BY[S.day].pieces[+el.getAttribute("data-done")]; st.done[pc.key] = !st.done[pc.key]; if (!st.done[pc.key]) delete st.done[pc.key]; save(); var sy = panel.querySelector(".body"); var keep = sy ? sy.scrollTop : 0; renderAll(); var nb = panel.querySelector(".body"); if (nb) nb.scrollTop = keep; window.scrollTo(0, y0); }
     else if (el.hasAttribute("data-back")) { S.piece = -1; renderDay(true); }
     else if (el.hasAttribute("data-v")) { S.v = +el.getAttribute("data-v"); var bt = panel.querySelector(".body"); var tp = bt ? bt.scrollTop : 0; renderPiece(); var nb2 = panel.querySelector(".body"); if (nb2) nb2.scrollTop = tp; }
     else if (el.hasAttribute("data-nav")) { var j = ORDER.indexOf(S.day) + (+el.getAttribute("data-nav")); if (ORDER[j]) selectDay(ORDER[j]); }
-    else if (el.hasAttribute("data-donep")) { var q = BY[S.day].pieces[S.piece]; st.done[q.key] = !st.done[q.key]; if (!st.done[q.key]) delete st.done[q.key]; save(); renderGrid(); renderTrack(); renderCount(); var b2 = panel.querySelector(".body"), k2 = b2 ? b2.scrollTop : 0; renderPiece(); var b3 = panel.querySelector(".body"); if (b3) b3.scrollTop = k2; toast(st.done[q.key] ? "Marcada como hecha ✓" : "Desmarcada"); }
+    else if (el.hasAttribute("data-donep")) { var y1 = window.pageYOffset; var q = BY[S.day].pieces[S.piece]; st.done[q.key] = !st.done[q.key]; if (!st.done[q.key]) delete st.done[q.key]; save(); renderGrid(); renderTrack(); renderCount(); var b2 = panel.querySelector(".body"), k2 = b2 ? b2.scrollTop : 0; renderPiece(); var b3 = panel.querySelector(".body"); if (b3) b3.scrollTop = k2; window.scrollTo(0, y1); toast(st.done[q.key] ? "Marcada como hecha ✓" : "Desmarcada"); }
   });
   /* flechas del teclado en el calendario */
   document.addEventListener("keydown", function (ev) {
@@ -1465,12 +1490,24 @@ DAYS = [
 
   /* mis datos */
   var dlg = $("dlgSet"), FIELDS = { precio: "sPrecio", wa: "sWa", lugar: "sLugar", horario: "sHorario", meta: "sMeta", n: "sN" };
-  function openDlg() { Object.keys(FIELDS).forEach(function (k) { $(FIELDS[k]).value = cfg(k); }); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
+  function openDlg() { drawSabores(); Object.keys(FIELDS).forEach(function (k) { $(FIELDS[k]).value = cfg(k); }); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
   $("btnSet").onclick = openDlg;
   $("dsX").onclick = function () { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); };
   dlg.addEventListener("click", function (e) { if (e.target === dlg && dlg.close) dlg.close(); });
   Object.keys(FIELDS).forEach(function (k) {
     $(FIELDS[k]).addEventListener("input", function () { st.cfg[k] = this.value; save(); renderAll(); });
+  });
+  function drawSabores() {
+    var on = activeSabores().map(function (x) { return x.id; });
+    $("sSabores").innerHTML = SABORES.map(function (x) {
+      return '<label class="flv"><input type="checkbox" data-sabor="' + x.id + '"' + (on.indexOf(x.id) >= 0 ? " checked" : "") + '><span>' + x.emoji + " " + x.n + "</span></label>";
+    }).join("");
+    $("sPrev").textContent = "Así se leerá: «TostiAguachile " + tok("{SABOR}") + "» · plural: «TostiAguachiles " + tok("{SABORES}") + "»";
+  }
+  $("sSabores").addEventListener("change", function (e) {
+    var ids = [].map.call($("sSabores").querySelectorAll("input:checked"), function (i) { return i.getAttribute("data-sabor"); });
+    if (!ids.length) { ids = [e.target.getAttribute("data-sabor")]; toast("Deja al menos un sabor marcado"); }
+    st.cfg.sabores = ids; save(); drawSabores(); renderAll();
   });
 
   $("btnEs").setAttribute("aria-pressed", String(st.es));
