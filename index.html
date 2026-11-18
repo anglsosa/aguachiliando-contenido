@@ -1,0 +1,1485 @@
+<!doctype html>
+<html lang="es-MX">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aguachiliando · contenido</title>
+<script>
+  /* Aplica el tema antes de pintar para evitar el parpadeo. */
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem("aguachiliando-theme"); } catch (e) {}
+    if (t !== "light" && t !== "dark") t = matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+    document.documentElement.setAttribute("data-theme", t);
+  })();
+</script>
+<style>
+  :root {
+    color-scheme: light;
+    --bg: #ffffff; --ink: #0a0a0a; --ink2: #404040; --mute: #737373;
+    --line: #ebebeb; --line2: #d4d4d4; --soft: #f7f7f7;
+    --ia: #d97706; --db: #2563eb; --http: #16a34a; --err: #dc2626;
+    --shadow: 0 1px 2px rgba(0,0,0,.04), 0 8px 24px rgba(0,0,0,.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --bg: #0a0a0a; --ink: #fafafa; --ink2: #d0d0d0; --mute: #8c8c8c;
+      --line: #232323; --line2: #3b3b3b; --soft: #121212;
+      --ia: #f59e0b; --db: #60a5fa; --http: #4ade80; --err: #f87171;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #0a0a0a; --ink: #fafafa; --ink2: #d0d0d0; --mute: #8c8c8c;
+    --line: #232323; --line2: #3b3b3b; --soft: #121212;
+    --ia: #f59e0b; --db: #60a5fa; --http: #4ade80; --err: #f87171;
+    --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.5);
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background: var(--bg); color: var(--ink); overflow: hidden;
+    font: 14.5px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%;
+    -webkit-font-smoothing: antialiased;
+    padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px);
+  }
+  code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  button { font: inherit; color: inherit; cursor: pointer; }
+  :focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  svg.i { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+
+  /* ---------- barra superior ---------- */
+  .top { padding: 12px 20px 0; background: var(--bg); }
+  .row1 { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 12px; min-width: 0; }
+  .logo { width: 30px; height: 30px; border-radius: 9px; background: var(--ink); color: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: 15px; flex: none; }
+  h1 { margin: 0; font-size: 15px; line-height: 1.2; letter-spacing: -.01em; }
+  .tag { margin: 1px 0 0; color: var(--mute); font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ctrl { display: flex; align-items: center; gap: 8px; }
+  .seg { display: inline-flex; border: 1px solid var(--line2); border-radius: 10px; overflow: hidden; background: var(--bg); }
+  .seg button { border: 0; background: transparent; padding: 0 12px; height: 34px; display: inline-flex; align-items: center; gap: 7px; }
+  .seg button + button { border-left: 1px solid var(--line2); }
+  .seg button:hover:not([disabled]) { background: var(--soft); }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); font-weight: 600; }
+  .seg button[aria-pressed="true"]:hover { background: var(--ink); opacity: .86; }
+  .counter { font-variant-numeric: tabular-nums; color: var(--mute); font-size: 13px; min-width: 46px; text-align: center; white-space: nowrap; }
+  .ib { width: 34px; height: 34px; border: 1px solid var(--line2); background: var(--bg); border-radius: 10px; display: grid; place-items: center; position: relative; }
+  .ib:hover { background: var(--soft); }
+  .ib[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+  .sep { width: 1px; height: 22px; background: var(--line2); margin: 0 2px; }
+  select, input[type=text], input[type=number] { font: inherit; font-size: 14px; color: var(--ink); background: var(--bg); border: 1px solid var(--line2); border-radius: 8px; height: 36px; padding: 0 10px; width: 100%; }
+
+  .track { display: flex; gap: 3px; padding: 8px 0 10px; }
+  .track button { flex: 1 1 0; height: 20px; border: 0; background: transparent; padding: 0; position: relative; }
+  .track button::after { content: ""; position: absolute; left: 0; right: 0; top: 8px; height: 4px; border-radius: 3px; background: var(--line2); transition: background .3s, height .2s, top .2s; }
+  .track button.done::after { background: var(--ink); }
+  .track button.cur::after { background: var(--ink); height: 8px; top: 6px; }
+  .track button.part::after { background: color-mix(in srgb, var(--ink) 40%, var(--line2)); }
+  .track button:hover::after { height: 8px; top: 6px; }
+
+  /* ---------- zona principal ---------- */
+  main { min-height: 0; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(380px, .85fr); gap: 16px; padding: 4px 20px 18px; }
+  .card { border: 1px solid var(--line); border-radius: 16px; background: var(--bg); box-shadow: var(--shadow); min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* ---------- calendario ---------- */
+  .calhead { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 18px 8px; }
+  .calhead h2 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -.015em; text-transform: capitalize; }
+  .calhead .sub { color: var(--mute); font-size: 12.5px; margin-top: 1px; }
+  .wk { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); padding: 0 12px; }
+  .wk span { text-align: center; font-size: 11px; text-transform: uppercase; letter-spacing: .07em; color: var(--mute); font-weight: 600; padding: 6px 0; }
+  .grid { flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); grid-auto-rows: minmax(92px, 1fr); gap: 4px; padding: 0 12px 14px; overflow: auto; scrollbar-width: thin; }
+  .cell { border: 1px solid var(--line); border-radius: 10px; background: var(--bg); padding: 6px 6px 5px; text-align: left; display: flex; flex-direction: column; gap: 3px; min-width: 0; position: relative; overflow: hidden; }
+  .cell.out { background: transparent; border-color: transparent; color: var(--mute); opacity: .45; cursor: default; }
+  .cell:not(.out):hover { border-color: var(--ink); }
+  .cell.sel { border-color: var(--ink); background: var(--soft); box-shadow: inset 0 0 0 1px var(--ink); }
+  .cell.today .num { background: var(--ink); color: var(--bg); }
+  .cell.empty { background: var(--soft); }
+  .cell .top2 { display: flex; align-items: center; justify-content: space-between; gap: 4px; }
+  .num { font-size: 12.5px; font-weight: 600; font-variant-numeric: tabular-nums; min-width: 22px; height: 22px; border-radius: 99px; display: grid; place-items: center; padding: 0 6px; }
+  .open { font-size: 9.5px; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; color: var(--http); border: 1px solid color-mix(in srgb, var(--http) 55%, transparent); border-radius: 99px; padding: 0 6px; line-height: 15px; }
+  .chip { display: flex; align-items: center; gap: 5px; font-size: 11.5px; line-height: 1.25; padding: 2px 6px; border-radius: 6px; border: 1px solid var(--line); border-left: 3px solid var(--c, var(--ink)); background: var(--bg); color: var(--ink2); min-width: 0; }
+  .chip span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+  .chip.done { opacity: .5; }
+  .chip.done span { text-decoration: line-through; }
+  .chip.t-video { --c: var(--ink); } .chip.t-flyer { --c: var(--db); } .chip.t-hist { --c: var(--ia); }
+  .chip.t-foto { --c: var(--db); } .chip.t-mk { --c: var(--http); } .chip.t-tarea { --c: var(--mute); }
+  .more { font-size: 11px; color: var(--mute); padding-left: 2px; }
+  .foot { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; justify-content: space-between; padding: 9px 16px 11px; border-top: 1px solid var(--line); color: var(--mute); font-size: 12.5px; }
+  .legend { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; background: var(--c); }
+
+  /* ---------- panel ---------- */
+  .panel .head { padding: 18px 20px 0; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-bottom: 10px; font-size: 12px; }
+  .pill { border: 1px solid var(--line2); border-radius: 99px; padding: 1px 10px; color: var(--mute); white-space: nowrap; }
+  .pill.es { border-color: color-mix(in srgb, var(--http) 60%, transparent); color: var(--http); }
+  .pill.ex { border-color: color-mix(in srgb, var(--db) 60%, transparent); color: var(--db); }
+  .pill.ta { border-color: color-mix(in srgb, var(--ia) 60%, transparent); color: var(--ia); }
+  .pill.alta { border-color: color-mix(in srgb, var(--http) 60%, transparent); color: var(--http); }
+  .pill.media { border-color: color-mix(in srgb, var(--db) 60%, transparent); color: var(--db); }
+  .pill.baja { border-color: color-mix(in srgb, var(--ia) 60%, transparent); color: var(--ia); }
+  .stepno { color: var(--mute); font-size: 12px; font-variant-numeric: tabular-nums; margin-right: 2px; }
+  .panel h2 { margin: 0; font-size: 21px; line-height: 1.25; letter-spacing: -.015em; }
+  .tabs { display: flex; gap: 4px; margin: 14px 20px 0; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+  .tabs button { border: 0; background: transparent; padding: 8px 12px 9px; color: var(--mute); font-size: 13.5px; border-bottom: 2px solid transparent; margin-bottom: -1px; display: inline-flex; gap: 7px; align-items: center; white-space: nowrap; }
+  .tabs button:hover { color: var(--ink); }
+  .tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); font-weight: 600; }
+  .tabs .n { font-size: 11px; background: var(--soft); border: 1px solid var(--line); border-radius: 99px; padding: 0 6px; color: var(--mute); font-weight: 500; }
+  .body { flex: 1; min-height: 0; overflow: auto; padding: 16px 20px 22px; scrollbar-width: thin; }
+  .fade { animation: fade .28s ease both; }
+  @keyframes fade { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+  .lead { margin: 0 0 14px; font-size: 15.5px; color: var(--ink); line-height: 1.55; }
+  h3 { margin: 0 0 8px; font-size: 11.5px; text-transform: uppercase; letter-spacing: .07em; color: var(--mute); font-weight: 600; }
+  .sec + .sec { margin-top: 20px; }
+  .back { border: 0; background: transparent; color: var(--mute); padding: 0; margin: 0 0 10px; display: inline-flex; gap: 6px; align-items: center; font-size: 13px; }
+  .back:hover { color: var(--ink); }
+
+  /* lista de piezas del día */
+  .pz { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: 0 10px; align-items: start; border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin-bottom: 8px; background: var(--bg); width: 100%; text-align: left; }
+  .pz:hover { border-color: var(--ink); background: var(--soft); }
+  .pz .ico { width: 30px; height: 30px; border-radius: 9px; display: grid; place-items: center; color: var(--bg); background: var(--c, var(--ink)); }
+  .pz .ico svg { width: 16px; height: 16px; }
+  .pz.t-video { --c: var(--ink); } .pz.t-flyer, .pz.t-foto { --c: var(--db); } .pz.t-hist { --c: var(--ia); } .pz.t-mk { --c: var(--http); } .pz.t-tarea { --c: var(--mute); }
+  .pz .tt { font-weight: 600; font-size: 14.5px; line-height: 1.35; }
+  .pz .mm { color: var(--mute); font-size: 12.5px; margin-top: 2px; }
+  .pz.done .tt { text-decoration: line-through; opacity: .55; }
+  .okmark { width: 22px; height: 22px; border-radius: 7px; border: 1.6px solid var(--line2); display: grid; place-items: center; color: var(--bg); }
+  .pz.done .okmark { background: var(--http); border-color: var(--http); }
+
+  /* nota / aviso */
+  .nota { --c: var(--ia); border: 1px solid color-mix(in srgb, var(--c) 40%, var(--line)); border-left: 3px solid var(--c); border-radius: 10px; padding: 11px 14px; background: color-mix(in srgb, var(--c) 5%, var(--bg)); margin-bottom: 8px; }
+  .nota.db { --c: var(--db); } .nota.http { --c: var(--http); } .nota.err { --c: var(--err); }
+  .nota b { display: block; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: var(--c); margin-bottom: 3px; }
+  .nota p, .nota li { margin: 0; color: var(--ink2); font-size: 13.5px; }
+  .nota ul { margin: 0; padding-left: 18px; }
+
+  /* bloques que se copian con un clic */
+  .cp { position: relative; display: block; width: 100%; text-align: left; border: 1px solid var(--line); border-radius: 10px; background: var(--soft); padding: 10px 40px 10px 12px; margin: 0 0 6px; color: var(--ink); font-size: 14px; line-height: 1.5; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .cp::after { content: ""; position: absolute; right: 11px; top: 11px; width: 15px; height: 15px; opacity: .35; background: currentColor; -webkit-mask: var(--copyico) center/contain no-repeat; mask: var(--copyico) center/contain no-repeat; }
+  .cp:hover { border-color: var(--ink); }
+  .cp:hover::after { opacity: .9; }
+  .cp.ok { border-color: var(--http); background: color-mix(in srgb, var(--http) 10%, var(--bg)); }
+  .cp.big { font-size: 14.5px; padding: 12px 42px 12px 14px; }
+  .cp.mono { font-size: 13px; }
+  :root { --copyico: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><rect x='9' y='9' width='11' height='11' rx='2'/><path d='M5 15V6a2 2 0 0 1 2-2h9'/></svg>"); }
+  .copyall { border: 1px solid var(--line2); background: var(--bg); border-radius: 10px; height: 34px; padding: 0 12px; display: inline-flex; align-items: center; gap: 7px; font-size: 13px; margin: 2px 6px 6px 0; }
+  .copyall:hover { background: var(--soft); }
+
+  /* escenas */
+  .paso + .paso { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--line); }
+  .paso-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .paso-n { width: 22px; height: 22px; border-radius: 50%; background: var(--ink); color: var(--bg); font-size: 11.5px; font-weight: 700; display: grid; place-items: center; flex: none; }
+  .paso-h h4 { margin: 0; font-size: 14.5px; line-height: 1.3; }
+  .paso-h .secs { margin-left: auto; color: var(--mute); font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .lbl { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--mute); margin: 8px 0 3px; font-weight: 600; }
+  .check { list-style: none; padding: 0; margin: 0; }
+  .check li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; margin: 0 0 6px; align-items: start; }
+  .check input { width: 18px; height: 18px; margin: 3px 0 0; accent-color: var(--ink); }
+  .none { color: var(--mute); font-size: 13px; margin: 0; }
+
+  /* ---------- diálogo y aviso ---------- */
+  dialog { border: 1px solid var(--line2); border-radius: 16px; padding: 0; width: min(560px, calc(100vw - 32px)); max-height: min(86vh, 720px); background: var(--bg); color: var(--ink); box-shadow: var(--shadow); }
+  dialog::backdrop { background: rgba(0,0,0,.45); backdrop-filter: blur(2px); }
+  dialog .dh { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid var(--line); position: sticky; top: 0; background: var(--bg); }
+  dialog .dh h2 { margin: 0; font-size: 17px; }
+  dialog .db { padding: 8px 20px 20px; overflow: auto; max-height: calc(min(86vh, 720px) - 66px); }
+  .set { display: grid; gap: 6px; margin-top: 14px; }
+  .set label { font-size: 12.5px; color: var(--mute); font-weight: 600; }
+  .hint { color: var(--mute); font-size: 12.5px; margin: 12px 0 0; }
+  #toast { position: fixed; left: 50%; bottom: calc(22px + env(safe-area-inset-bottom, 0px)); transform: translate(-50%, 16px); opacity: 0; pointer-events: none; z-index: 50;
+    background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 99px; font-size: 13px; box-shadow: var(--shadow);
+    transition: opacity .2s, transform .2s; max-width: calc(100vw - 32px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  #toast.on { opacity: 1; transform: translate(-50%, 0); }
+
+  /* ---------- pantalla chica ---------- */
+  @media (max-width: 999px), (max-height: 559px) {
+    body { overflow: auto; display: block; height: auto; }
+    main { grid-template-columns: 1fr; padding-bottom: 20px; }
+    .grid { overflow: visible; grid-auto-rows: minmax(84px, auto); }
+    .panel { min-height: 460px; }
+    .tag, .hide-s { display: none; }
+    .top { position: sticky; top: 0; z-index: 5; }
+  }
+  @media (max-width: 640px) {
+    .brand, .sep, #cnt { display: none; }
+    .top { padding: 10px 16px 0; }
+    main { padding: 4px 12px 18px; gap: 12px; }
+    .row1 { display: block; }
+    .ctrl { flex-wrap: wrap; row-gap: 8px; }
+    #months { flex: 1; } #months button { flex: 1; justify-content: center; }
+    .ib, .seg button { min-width: 38px; height: 38px; } .ib { width: 38px; }
+    .grid { gap: 3px; padding: 0 8px 12px; grid-auto-rows: minmax(62px, auto); }
+    .cell { padding: 4px 3px; border-radius: 8px; align-items: center; }
+    .cell .top2 { flex-direction: column; gap: 2px; }
+    .open { font-size: 0; width: 6px; height: 6px; padding: 0; border-radius: 50%; background: var(--http); border: 0; line-height: 6px; }
+    .chip { width: 100%; height: 6px; padding: 0; border: 0; border-radius: 3px; background: var(--c); }
+    .chip span { display: none; }
+    .more { display: none; }
+    .calhead { padding: 12px 14px 6px; }
+    .panel .head { padding: 16px 16px 0; } .tabs { margin: 12px 16px 0; } .body { padding: 14px 16px 22px; }
+    .panel h2 { font-size: 19px; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  /* ---------- extras ---------- */
+  .pzrow { display: flex; gap: 8px; align-items: stretch; margin-bottom: 8px; }
+  .pzrow .pz { flex: 1 1 auto; min-width: 0; margin: 0; grid-template-columns: 30px minmax(0, 1fr); }
+  .pzrow .okb { flex: none; width: 46px; border: 1px solid var(--line); border-radius: 12px; background: var(--bg); display: grid; place-items: center; padding: 0; }
+  .pzrow .okb:hover { border-color: var(--ink); background: var(--soft); }
+  .pzrow.done .tt { text-decoration: line-through; opacity: .55; }
+  .pzrow.done .okmark { background: var(--http); border-color: var(--http); }
+  .pz .mm .pill { font-size: 11px; }
+  .copyall[disabled] { opacity: .4; cursor: default; }
+  .copyall svg { width: 14px; height: 14px; }
+  .cp { font-family: inherit; }
+  .cp.mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  .tabs button { flex: none; }
+  .panel .body { overflow-wrap: anywhere; }
+  .lead { overflow-wrap: anywhere; }
+  .cp:active { transform: scale(.995); }
+  @media (max-width: 640px) {
+    .pzrow .okb { width: 42px; }
+    .cp, .cp.big { font-size: 14px; }
+    .copyall { height: 38px; }
+    .tabs button { padding: 9px 11px 10px; }
+    dialog { width: calc(100vw - 24px); }
+    input, select { font-size: 16px; } /* evita el zoom automático de iOS */
+  }
+  @media (max-width: 380px) { .calhead h2, .panel h2 { font-size: 18px; } .grid { gap: 2px; padding: 0 6px 10px; } }
+  .grid { grid-auto-rows: minmax(120px, 1fr); }
+  @media (max-width: 999px), (max-height: 559px) { .grid { grid-auto-rows: minmax(112px, auto); } }
+  @media (max-width: 640px) { .grid { grid-auto-rows: minmax(62px, auto); } }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="row1">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">A</div>
+      <div><h1>Aguachiliando · contenido</h1><p class="tag">Qué subir cada día, del 18 de noviembre al 17 de diciembre</p></div>
+    </div>
+    <div class="ctrl" role="group" aria-label="Controles">
+      <div class="seg" id="months" role="group" aria-label="Mes">
+        <button id="mNov" aria-pressed="true">Noviembre</button>
+        <button id="mDic" aria-pressed="false">Diciembre</button>
+      </div>
+      <button class="seg hide-s" id="goToday" style="height:34px;padding:0 12px;border:1px solid var(--line2);border-radius:10px;background:var(--bg)">Hoy</button>
+      <span class="counter" id="cnt" aria-live="polite">0 / 0</span>
+      <span class="sep" aria-hidden="true"></span>
+      <button class="ib" id="btnEs" aria-pressed="false" aria-label="Solo esenciales" title="Mostrar solo lo esencial"><svg class="i" viewBox="0 0 24 24"><path d="M3 5h18l-7 8v6l-4 2v-8z"/></svg></button>
+      <button class="ib" id="btnSet" aria-label="Mis datos" title="Mis datos (precio, meta, teléfono…)"><svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+      <button class="ib" id="btnTheme" aria-label="Cambiar tema" title="Cambiar tema claro / oscuro"></button>
+    </div>
+  </div>
+  <div class="track" id="track" role="tablist" aria-label="Días del plan"></div>
+</header>
+
+<main>
+  <section class="card cal" aria-label="Calendario">
+    <div class="calhead"><div><h2 id="calTitle">Noviembre 2026</h2><div class="sub" id="calSub"></div></div></div>
+    <div class="wk" aria-hidden="true"><span>Lun</span><span>Mar</span><span>Mié</span><span>Jue</span><span>Vie</span><span>Sáb</span><span>Dom</span></div>
+    <div class="grid" id="grid"></div>
+    <div class="foot">
+      <div class="legend">
+        <span><i style="--c:var(--ink)"></i>Video</span>
+        <span><i style="--c:var(--db)"></i>Flyer / foto</span>
+        <span><i style="--c:var(--ia)"></i>Historias</span>
+        <span><i style="--c:var(--http)"></i>Marketplace</span>
+        <span><i style="--c:var(--mute)"></i>Tarea</span>
+      </div>
+      <span><span class="open" style="margin-right:6px">Abierto</span>vie, sáb y dom</span>
+    </div>
+  </section>
+  <section class="card panel" aria-label="Detalle" id="panel"></section>
+</main>
+
+<dialog id="dlgSet" aria-labelledby="dsT">
+  <div class="dh"><h2 id="dsT">Mis datos</h2><button class="ib" id="dsX" aria-label="Cerrar"><svg class="i" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="db">
+    <p class="hint" style="margin-top:6px">Los textos del calendario usan estos datos. Cámbialos aquí y se actualizan solos en todas las piezas.</p>
+    <div class="set"><label for="sPrecio">Precio del TostiAguachile</label><input id="sPrecio" type="text" inputmode="text" autocomplete="off"></div>
+    <div class="set"><label for="sWa">WhatsApp de pedidos</label><input id="sWa" type="text" inputmode="tel" autocomplete="off"></div>
+    <div class="set"><label for="sLugar">Dónde estás</label><input id="sLugar" type="text" autocomplete="off"></div>
+    <div class="set"><label for="sHorario">Horario y días</label><input id="sHorario" type="text" autocomplete="off"></div>
+    <div class="set"><label for="sMeta">Meta de aguachiles del mes</label><input id="sMeta" type="number" min="1" inputmode="numeric"></div>
+    <div class="set"><label for="sN">Cuántos llevas vendidos (míralo en la app Sellos)</label><input id="sN" type="number" min="0" inputmode="numeric"></div>
+    <p class="hint">Tu meta inicial es 150. Súbela o bájala según cómo vayas. Estos datos se guardan solo en este navegador.</p>
+  </div>
+</dialog>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+/* =====================================================================
+   Datos y textos (se rellenan en las partes siguientes del archivo)
+   ===================================================================== */
+var FORMATS = {};   // id -> function(params) { ... }
+var DAYS = [];      // [{date, items:[{f, p, prio, hora}]}]
+</script>
+
+<script>
+
+/* ---------- ayudantes ---------- */
+var TAGS = "#tostiaguachiles #aguachiles #mariscos #FoodTokMexico #Texmelucan #SanMartinTexmelucan #Puebla";
+function S(dur, mostrar, decir, pant) { return { dur: dur, mostrar: mostrar, decir: decir, pant: pant }; }
+function D(t) { return t + "\n\n📍 {LUGAR} · {HORARIO}\nTostiAguachile Negro {PRECIO} · Pedidos: {WA}\n\n" + TAGS; }
+var PLAT_V = "TikTok · Reels de Instagram · Reels de Facebook";
+var PIE_V = [
+  "Formato vertical 9:16, con el celular quieto (apóyalo en la hielera) o con las dos manos.",
+  "Luz del día, de frente o de lado. Evita grabar con el sol a tu espalda.",
+  "Limpia el lente antes de grabar.",
+  "Las primeras palabras se oyen y se leen en los primeros 2 segundos: no empieces con “hola”.",
+  "Sube el mismo video a los tres lugares, con su descripción pegada."
+];
+function VID(o) { o.t = "video"; o.plat = o.plat || PLAT_V; o.pie = o.pie || PIE_V; return o; }
+
+/* ============ 1. Lanzamiento ============ */
+FORMATS.lanzamiento = function () { return VID({
+  nombre: "Lanzamiento: ya llegaron los TostiAguachiles Negros", ev: "a", dur: "18 a 20 s", hora: "Hoy, de 12 a 2 pm o de 7 a 9 pm",
+  porque: "Un negocio nuevo anunciado con su dirección fue lo que más alcance tuvo en Texmelucan (195 mil vistas). Este es tu anuncio de “aquí estamos”.",
+  necesitas: ["De 3 a 5 clips o fotos que ya tengas: el reel “Algo bien para nuestros clientes”, la bolsa con el tenedor, el letrero de {PRECIO}.", "Editor del celular (CapCut o el de TikTok).", "Opcional: tu voz grabada encima."],
+  v: [
+    { e: "Directo", gancho: "¡Texmelucan, ya llegaron los TostiAguachiles Negros!", audio: "Tu voz con música suave de fondo (de la biblioteca de la app).",
+      esc: [
+        S("0–3 s", "El clip más llamativo: la bolsa abierta con el tenedor, en primer plano.", "¡Texmelucan, ya llegaron los TostiAguachiles Negros!", "¡YA LLEGARON! 🔥"),
+        S("3–8 s", "Clips del puesto: la hielera, el letrero de {PRECIO}, las bolsas de Tostitos acomodadas.", "Camarón, pepino, cebolla morada y nuestro aderezo negro. Todo preparado al momento.", "Camarón fresco · preparado al momento"),
+        S("8–13 s", "Manos echando el aderezo y el ajonjolí sobre la bolsa (cámara lenta si puedes).", "Normales o picantes, tú escoges.", "Normales o picantes"),
+        S("13–19 s", "El letrero de {PRECIO} y una toma del lugar para que lo reconozcan.", "{PRECIO}. Estamos {LUGAR}, {HORARIO}.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("¡Texmelucan, ya llegaron los TostiAguachiles Negros! 🔥 Normales o picantes, preparados al momento."), fijado: "¿Normales o picantes? 👇" },
+    { e: "Con humor", gancho: "Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida? 😅", audio: "Tu voz, sin música. Un sonido gracioso de la app si quieres en el corte.",
+      esc: [
+        S("0–3 s", "Tú, serio, mirando a cámara con una bolsa cerrada en la mano.", "Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida?", "¿Qué haces con tu vida? 😅"),
+        S("3–7 s", "Corte rápido: abres la bolsa de golpe y aparece todo el aguachile.", "Porque en Texmelucan ya llegaron.", "YA LLEGARON"),
+        S("7–13 s", "Pepino, camarón y cebolla cayendo sobre las papas, cortes de un segundo.", "Camarón, pepino, cebolla morada… y ese aderezo negro que no perdona.", "Aderezo negro 🖤"),
+        S("13–19 s", "Das el primer bocado a cámara y cierras los ojos.", "{PRECIO}. {LUGAR}, {HORARIO}. Y ya.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("Si todavía no has probado un TostiAguachile Negro… ¿qué haces con tu vida? 😅"), fijado: "Cuéntanos: ¿normal o picante? 🔥" },
+    { e: "Cercano", gancho: "Vecinos de Texmelucan: ya estamos aquí 👋", audio: "Tu voz tranquila, sin música o con música muy bajita.",
+      esc: [
+        S("0–3 s", "Tú saludando a cámara, con el puesto detrás.", "Vecinos de Texmelucan, ya estamos aquí.", "Ya estamos aquí 👋"),
+        S("3–8 s", "Muestras el puesto completo, despacio, de izquierda a derecha.", "Somos Aguachiliando y venimos a prepararte el antojo del fin de semana.", "Aguachiliando"),
+        S("8–14 s", "Preparas una bolsa con calma, plano cerrado de tus manos.", "Camarón fresquecito, pepino, cebolla y nuestra salsa negra. Hecho al momento y con cariño.", "Hecho al momento"),
+        S("14–20 s", "Entregas la bolsa a una persona (con su permiso) y sonríes.", "Te esperamos {LUGAR}, {HORARIO}. Ven por el tuyo.", "📍 {LUGAR}")],
+      desc: D("Vecinos de Texmelucan, ya estamos aquí 👋 Ven por tu TostiAguachile Negro."), fijado: "¿Ya sabías que estábamos aquí? 👇" }
+  ] }); };
+
+/* ============ 2. Ya abrimos (cada viernes) ============ */
+FORMATS.ya_abrimos = function (p) { var nota = p.nota || ""; return VID({
+  nombre: "Ya abrimos 🔥" + (p.titulo ? " · " + p.titulo : ""), ev: "a", dur: "12 a 15 s", hora: "10:30 am (antes de abrir)",
+  porque: "Anunciar con 📍 que abriste fue lo que más alcance tuvo en tu zona. Repetirlo cada viernes lo convierte en un hábito que tus seguidores esperan.",
+  necesitas: ["El puesto ya armado, con el letrero de {PRECIO} a la vista.", "Una bolsa lista para armar en cámara."],
+  v: [
+    { e: "Directo", gancho: "Ya abrimos.", audio: "Música animada de fondo, tu voz arriba.",
+      esc: [
+        S("0–2 s", "Tu mano levantando la tapa de la hielera (plano cerrado, luz del día).", "Ya abrimos.", "YA ABRIMOS 🔥"),
+        S("2–6 s", "Giro rápido por el puesto armado: letrero, salsas, bolsas de Tostitos.", "Viernes de TostiAguachile Negro.", "📍 {LUGAR}"),
+        S("6–11 s", "Armas una bolsa de principio a fin en cortes rápidos: abrir, camarón, pepino, cebolla, aderezo.", "Camarón fresco, preparado al momento.", "Preparado al momento"),
+        S("11–15 s", "Entregas la bolsa a cámara con el tenedor.", "Aquí te esperamos. " + nota, "{PRECIO} · {HORARIO}")],
+      desc: D("Ya abrimos 🔥 " + nota), fijado: "¿Quién viene hoy? 🙋" },
+    { e: "Con humor", gancho: "Alerta: se abrió el antojo.", audio: "Un sonido de “alerta” de la app al inicio, luego tu voz.",
+      esc: [
+        S("0–2 s", "Plano de tu cara muy cerca, con ojos grandes.", "Alerta: se abrió el antojo.", "🚨 SE ABRIÓ EL ANTOJO"),
+        S("2–6 s", "Quitas la tapa de la hielera de golpe y sale “vapor” de frío (o solo la abres rápido).", "Ya hay camarón, ya hay aderezo negro y ya hay Tostitos.", "Todo listo"),
+        S("6–11 s", "Cierras con una bolsa servida en primer plano, la giras para que se vea.", "Y tú, ¿qué estás esperando?", "¿Y tú? 👀"),
+        S("11–15 s", "Señalas hacia abajo hacia el texto.", "Frente a la UIEST, hasta las tres. " + nota, "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("🚨 Alerta: se abrió el antojo. " + nota), fijado: "Avísale al que te debe un aguachile 😏" },
+    { e: "Cercano", gancho: "Buenos días, Texmelucan.", audio: "Tu voz tranquila, con el sonido ambiente del lugar.",
+      esc: [
+        S("0–3 s", "Tú al lado del puesto, con la hielera abierta atrás.", "Buenos días, Texmelucan.", "Buenos días ☀️"),
+        S("3–7 s", "Acomodas el letrero y las salsas, sin prisa.", "Hoy otra vez estamos aquí, listos para atenderte.", "Listos para atenderte"),
+        S("7–12 s", "Preparas una bolsa y la muestras de cerca.", "Hecho al momento, con mucho cariño.", "Hecho al momento"),
+        S("12–15 s", "Sonríes a cámara.", "Te esperamos hasta las tres. " + nota, "📍 {LUGAR}")],
+      desc: D("Buenos días, Texmelucan ☀️ Ya abrimos. " + nota), fijado: "¿Cómo amaneciste hoy? 👇" }
+  ] }); };
+
+/* ============ 3. Reto a los escépticos (sábado) ============ */
+FORMATS.reto = function () { return VID({
+  nombre: "Reto: “dicen que nomás lo hacemos así para el video”", ev: "b", dur: "15 a 20 s", hora: "12 pm (con gente en el puesto)",
+  porque: "Un video de este tipo llegó a 45 mil vistas en Arizona. Funciona porque muestra que el producto es real y provoca comentarios.",
+  necesitas: ["Una persona en la fila o en el puesto que acepte salir en el video (pídele permiso).", "Una bolsa que se prepare entera frente a cámara, sin cortes."],
+  v: [
+    { e: "Directo", gancho: "Dicen que nomás lo hacemos así para el video.", audio: "Sonido real del puesto, sin música.",
+      esc: [
+        S("0–3 s", "Tú a cámara, con una bolsa vacía en la mano.", "Dicen que nomás lo hacemos así para el video.", "“Es nomás para el video” 🙄"),
+        S("3–12 s", "Preparas una bolsa entera, sin cortes, con las manos bien visibles. Un cliente espera.", "Mira. Así lo hacemos todos los días, para todos.", "Sin trucos"),
+        S("12–17 s", "Entregas la bolsa al cliente y él da el primer bocado.", "Aquí los esperamos.", "📍 {LUGAR}")],
+      desc: D("Para los que dicen que nomás lo hacemos así para el video… aquí los esperamos 🫡"), fijado: "Ven y compruébalo 😎" },
+    { e: "Con humor", gancho: "“Es nomás para el video.” Ajá. Mira.", audio: "Un sonido de “mmm” de la app y tu voz.",
+      esc: [
+        S("0–3 s", "Pones cara de “no lo puedo creer” y te señalas.", "“Es nomás para el video.” Ajá. Mira.", "“Es nomás para el video” 🙃"),
+        S("3–11 s", "Armas la bolsa con velocidad, sin cortes, mientras el cliente te mira.", "Camarón, pepino, cebolla, aderezo… y sin editar nada.", "Sin editar nada"),
+        S("11–17 s", "El cliente prueba y asiente. Tú te cruzas de brazos.", "Ya lo ven. Así sabe de verdad.", "Así sabe de verdad 🔥")],
+      desc: D("“Es nomás para el video” 🙃 Ven a comprobarlo."), fijado: "¿Quién dijo que era mentira? 👀" },
+    { e: "Cercano", gancho: "Nos han dicho que esto no es real. Les enseño.", audio: "Tu voz natural, con el sonido del lugar.",
+      esc: [
+        S("0–4 s", "Tú, con tono tranquilo, mirando a cámara.", "Nos han dicho que esto no es real. Les enseño cómo lo preparamos.", "Les enseño ✌️"),
+        S("4–13 s", "Preparas la bolsa sin cortes, explicando poquito lo que haces.", "Primero las papas, luego el camarón, después el pepino y la cebolla, y al final el aderezo.", "Paso a paso"),
+        S("13–18 s", "La entregas y cierras mirando a cámara.", "Esto es lo que vendemos. Pásate a probarlo.", "📍 {LUGAR}")],
+      desc: D("Nos dicen que no es real, así que se los enseño 🤝 Los esperamos."), fijado: "¿Ya lo probaste? Cuéntanos 👇" }
+  ] }); };
+
+/* ============ 4. Domingo de antojo ============ */
+FORMATS.domingo = function (p) { var nota = p.nota || ""; return VID({
+  nombre: (p.titulo || "Domingo de antojo") + ": hoy se nos acabó", ev: "e", dur: "12 a 15 s", hora: "Cuando se acabe, o a las 2:30 pm",
+  porque: "Tu foto “Algo bien” tuvo más compartidos que “me gusta”. Mostrar que se acaba crea urgencia y hace que lo compartan para el siguiente fin de semana.",
+  necesitas: ["La hielera casi vacía (graba cuando queden pocas porciones).", "Si no se acabó, usa la variante con “últimas porciones”."],
+  v: [
+    { e: "Directo", gancho: "Hoy se nos acabó a las 2.", audio: "Música suave y tu voz.",
+      esc: [
+        S("0–3 s", "La hielera casi vacía, vista desde arriba.", "Hoy se nos acabó a las dos.", "SE ACABÓ 🙌"),
+        S("3–8 s", "Las últimas bolsas servidas en fila.", "Gracias a todos los que vinieron.", "Gracias 🧡"),
+        S("8–13 s", "Tú recogiendo, sonriendo a cámara. " + nota, "Nos vemos el viernes a las once.", "Viernes 11 am · 📍 {LUGAR}")],
+      desc: D("Hoy se nos acabó 🙌 Gracias por venir. " + nota), fijado: "Avísales a tus amigos: el viernes llegamos temprano 🔥" },
+    { e: "Con humor", gancho: "Si no alcanzaste, esto es lo que te perdiste.", audio: "Tu voz con tono de “qué lástima”.",
+      esc: [
+        S("0–3 s", "Metes la mano a la hielera vacía y sacas aire.", "Si no alcanzaste, esto es lo que te perdiste.", "Lo que te perdiste 😢"),
+        S("3–9 s", "Cortes de bolsas servidas de hoy, una tras otra.", "Camarón, pepino, aderezo negro… se fue todo.", "Se fue todo"),
+        S("9–13 s", "Tú señalando el calendario con el dedo.", "El viernes llegamos a las once. Corre. " + nota, "Viernes 11 am ⏰")],
+      desc: D("Si no alcanzaste hoy… el viernes llegamos a las 11 🏃 " + nota), fijado: "¿Alcanzaste o te quedaste con las ganas? 😅" },
+    { e: "Cercano", gancho: "Qué bonito domingo, gracias, Texmelucan.", audio: "Tu voz tranquila.",
+      esc: [
+        S("0–4 s", "Tú, con el puesto recogido detrás, a cámara.", "Qué bonito domingo, Texmelucan. Gracias por venir.", "Gracias, Texmelucan 🧡"),
+        S("4–10 s", "Muestras cómo quedó el puesto vacío y las bolsas que quedan.", "Hoy se acabó antes de lo que esperábamos.", "Se acabó 🙌"),
+        S("10–14 s", "Cierras mirando a cámara. " + nota, "Nos vemos el viernes. Los queremos.", "Viernes 11 am")],
+      desc: D("Gracias por un domingo increíble, Texmelucan 🧡 " + nota), fijado: "¿Qué fue lo que más te gustó? 👇" }
+  ] }); };
+
+/* ============ 5. Costos con números reales (lunes) ============ */
+FORMATS.costos = function () { return VID({
+  nombre: "Costos: 5 kg de camarón = $800, ¿cuántos aguachiles salen?", ev: "i", dur: "20 a 25 s", hora: "12 a 2 pm",
+  porque: "Mostrar precio y porción es el formato más común en TikTok con tostiaguachile, y la gente confía más cuando ve de dónde sale el precio.",
+  necesitas: ["El camarón o una foto del recibo (o la nota del mercado).", "Una calculadora o la app de notas del celular para mostrar la cuenta.", "Revisa antes que los números (5 kg, $800, unos 22 aguachiles) sigan siendo los tuyos."],
+  v: [
+    { e: "Directo", gancho: "Esto es lo que cuesta el camarón de un fin de semana.", audio: "Tu voz, sin música.",
+      esc: [
+        S("0–4 s", "La bolsa o la hielera con el camarón y el recibo encima.", "Esto es lo que cuesta el camarón de un fin de semana: cinco kilos, ochocientos pesos.", "5 kg de camarón = $800"),
+        S("4–11 s", "La calculadora en pantalla: 5 kg × 4.5 porciones.", "De cada kilo salen unos cuatro aguachiles y medio. O sea, unos veintidós.", "≈ 22 aguachiles"),
+        S("11–19 s", "Una bolsa servida de cerca.", "Y eso es solo el camarón. Falta el pepino, la cebolla, el limón, el aderezo y las papas.", "+ pepino, cebolla, limón, aderezo…"),
+        S("19–24 s", "Tú a cámara.", "Por eso cuidamos cada bolsa. {PRECIO}, {LUGAR}.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("Así se hace un aguachile: 5 kg de camarón = $800 y salen unos 22 🦐 ¡Cuidamos cada bolsa!"), fijado: "¿Querías saberlo? Dime qué más te gustaría ver 👇" },
+    { e: "Con humor", gancho: "Gasté $800 en camarón. Adivina cuántos aguachiles salen.", audio: "Tu voz con tono de “quiz”.",
+      esc: [
+        S("0–4 s", "Tú a cámara con el recibo en la mano.", "Gasté ochocientos pesos en camarón. Adivina cuántos aguachiles salen.", "¿Cuántos salen? 🤔"),
+        S("4–9 s", "Cuenta regresiva en pantalla, con música de suspenso.", "Piénsalo… tic, tac…", "3… 2… 1…"),
+        S("9–16 s", "Muestras la calculadora y el resultado.", "Unos veintidós. Sí, con todo y aderezo negro.", "≈ 22 aguachiles 🎉"),
+        S("16–22 s", "Sirves una bolsa y la giras.", "Ahora ya sabes por qué cada uno vale ciento veinte.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("¿Adivinaste? 5 kg de camarón = unos 22 aguachiles 🦐"), fijado: "Pon tu número en comentarios antes de ver el video 👇" },
+    { e: "Cercano", gancho: "Les cuento cuánto cuesta hacer lo que les vendo.", audio: "Tu voz natural, sin música.",
+      esc: [
+        S("0–5 s", "Tú, sentado junto a la hielera, a cámara.", "Les cuento cuánto cuesta hacer lo que les vendo. El camarón de un fin de semana: ochocientos pesos.", "$800 de camarón"),
+        S("5–13 s", "Muestras el camarón limpio y empacado.", "Con cinco kilos hacemos unos veintidós aguachiles. Y todavía hay que sumar lo demás.", "≈ 22 aguachiles"),
+        S("13–20 s", "Mostrar rápido pepino, cebolla, limón y el aderezo.", "Pepino, cebolla morada, limón, el aderezo, las papas y el aguacate.", "Todo fresco"),
+        S("20–25 s", "Tú, sonriendo.", "Por eso es {PRECIO}, y por eso nos importa que te guste.", "📍 {LUGAR}")],
+      desc: D("Así de transparentes: 5 kg de camarón = $800 y salen unos 22 aguachiles 🦐"), fijado: "¿Qué otra cosa te gustaría saber del puesto? 👇" }
+  ] }); };
+
+/* ============ 6. Sonido real (ASMR) ============ */
+FORMATS.asmr = function (p) { var f = p.foco || "picar pepino y exprimir limón"; return VID({
+  nombre: "Sonido real: " + f, ev: "d", dur: "12 a 15 s", hora: "12 a 2 pm o 7 a 9 pm",
+  porque: "Los artículos sobre comida callejera destacan el sonido de picar y los primeros planos (no encontré métricas propias del nicho). Es un video fácil de grabar y editar.",
+  necesitas: ["Un lugar sin ruido de fondo.", "Primer plano: acerca el celular a 15 o 20 cm (usa el modo 2x si lo tiene).", "Si tu celular tiene micrófono con audífonos, úsalo para que el sonido salga limpio."],
+  v: [
+    { e: "Solo sonido", gancho: "(Sin voz) El primer corte suena fuerte.", audio: "Sonido original del video, sin música ni voz.",
+      esc: [
+        S("0–3 s", "Primerísimo plano de: " + f + ". El primer sonido debe ser fuerte y claro.", "(sin voz)", "🔊 Ponle volumen"),
+        S("3–10 s", "Cortes rápidos de lo mismo desde otros ángulos, siempre de cerca.", "(sin voz)", ""),
+        S("10–14 s", "Un plano de la bolsa servida, con el aderezo cayendo despacio.", "(sin voz)", "TostiAguachile Negro · 📍 {LUGAR}")],
+      desc: D("Sube el volumen 🔊 " + f + "."), fijado: "¿Ya tienes hambre? 🤤" },
+    { e: "Susurrado", gancho: "(En voz baja) Esto es lo que estás oyendo.", audio: "Tu voz muy bajita, como susurro, sobre el sonido.",
+      esc: [
+        S("0–3 s", "Primer plano de: " + f + ".", "(susurrando) Esto es lo que estás oyendo.", "🔊 Ponte audífonos"),
+        S("3–9 s", "Sigue el corte, ahora con la bolsa ya abierta debajo.", "(susurrando) Todo fresco, todo al momento.", "Todo fresco"),
+        S("9–14 s", "Cierras con la bolsa servida.", "(susurrando) Ven a probarlo.", "📍 {LUGAR}")],
+      desc: D("Ponte audífonos 🎧 " + f + "."), fijado: "¿Te dio hambre? 😅" },
+    { e: "Con música", gancho: "Corte rápido al ritmo de la música.", audio: "Música rápida de la biblioteca de la app; los cortes caen al ritmo.",
+      esc: [
+        S("0–3 s", "Plano muy cercano de: " + f + ", con el primer corte justo en el primer golpe de música.", "(sin voz)", "🔥"),
+        S("3–10 s", "Cortes rápidos cada medio segundo: ingredientes, manos, bolsa.", "(sin voz)", ""),
+        S("10–14 s", "Bolsa lista con el aderezo cayendo.", "(sin voz)", "TostiAguachile Negro {PRECIO}")],
+      desc: D("Al ritmo del antojo 🎶 " + f + "."), fijado: "Etiqueta a quien invitarías 🙌" }
+  ] }); };
+
+/* ============ 7. Serie con meta (anuncio) ============ */
+FORMATS.meta_anuncio = function () { return VID({
+  nombre: "Serie con meta: “Vamos en {N} de {META}”", ev: "f", dur: "15 a 20 s", hora: "12 a 2 pm",
+  porque: "En Instagram, el video más fuerte de una cuenta de aguachiles fue una serie con meta (“hasta comprarnos un Mustang”). Una meta da una razón para seguirte cada semana.",
+  necesitas: ["Tu número de aguachiles vendidos (míralo en la app Sellos) para llenar {N}.", "Una pizarra o un papel grande donde escribir “{N} / {META}” para mostrarlo.", "Revisa tu meta en Mis datos (⚙️): se ajusta sola en todos los textos."],
+  v: [
+    { e: "Directo", gancho: "Nuestra meta: {META} TostiAguachiles antes del 17 de diciembre.", audio: "Música motivadora y tu voz.",
+      esc: [
+        S("0–3 s", "Escribes “0 / {META}” en la pizarra, a cámara.", "Nuestra meta: {META} TostiAguachiles antes del diecisiete de diciembre.", "META: {META} 🎯"),
+        S("3–9 s", "Cambias el número a “{N} / {META}” y lo muestras.", "Hoy vamos en {N}.", "Vamos en {N} de {META}"),
+        S("9–15 s", "Servir una bolsa y levantarla a cámara.", "Cada bolsa que compras nos acerca. Cada semana te cuento cómo vamos.", "Cada bolsa suma"),
+        S("15–19 s", "Tú a cámara.", "Ven, {LUGAR}, {HORARIO}.", "📍 {LUGAR}")],
+      desc: D("Nuestra meta: {META} TostiAguachiles antes del 17 de diciembre 🎯 Vamos en {N}. ¿Nos ayudas?"), fijado: "Vamos en {N} de {META}. ¡Cada semana te actualizo! 🙌" },
+    { e: "Con humor", gancho: "Voy a vender {META} aguachiles o me corto el pelo.", audio: "Tu voz, tono de apuesta, y un sonido de “reto” de la app.",
+      esc: [
+        S("0–3 s", "Te señalas el pelo (o la gorra).", "Voy a vender {META} aguachiles antes del diecisiete de diciembre… o me corto el pelo.", "{META} o me corto el pelo ✂️"),
+        S("3–9 s", "Muestras la pizarra con “{N} / {META}”.", "Y llevo… {N}. Sí, sí podemos.", "Llevo {N}"),
+        S("9–15 s", "Sirves una bolsa y la muerdes.", "Así que tú dime. ¿Me ayudas?", "¿Me ayudas? 🙏"),
+        S("15–19 s", "Sonríes a cámara.", "{LUGAR}, {HORARIO}.", "📍 {LUGAR}")],
+      desc: D("Voy a vender {META} aguachiles o me corto el pelo ✂️ Llevo {N}. Ayúdame 🙏"), fijado: "Tú decides: ¿me corto el pelo o no? 😂" },
+    { e: "Cercano", gancho: "Les quiero contar algo que queremos lograr juntos.", audio: "Tu voz natural, sin música.",
+      esc: [
+        S("0–4 s", "Tú, sentado, con la pizarra al lado.", "Les quiero contar algo que queremos lograr juntos: {META} TostiAguachiles antes del diecisiete de diciembre.", "Una meta juntos 🤝"),
+        S("4–10 s", "Muestras “{N} / {META}” escrito.", "Ya llevamos {N}, gracias a ustedes.", "Llevamos {N}"),
+        S("10–16 s", "Preparas una bolsa con calma.", "Cada semana les voy a ir contando cómo vamos.", "Cada semana te cuento"),
+        S("16–20 s", "Tú, sonriendo.", "Los esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Una meta que queremos lograr juntos: {META} TostiAguachiles 🤝 Llevamos {N}. Gracias."), fijado: "Gracias por ser parte de esto 🧡" }
+  ] }); };
+
+/* ============ 8. Curiosidad: ¿Unos Tostitos preparados o qué? ============ */
+FORMATS.curiosidad_bolsa = function () { return VID({
+  nombre: "Curiosidad: “¿Unos Tostitos preparados o qué?”", ev: "c", dur: "10 a 13 s", hora: "7 a 9 pm",
+  porque: "Un video con esta pregunta (en Houston) tuvo 25 mil vistas y 1,464 likes. Abre con una pregunta que se contesta con el producto.",
+  necesitas: ["Una bolsa de Tostitos cerrada y otra ya preparada.", "Poco tiempo: este video se graba en 5 minutos."],
+  v: [
+    { e: "Directo", gancho: "¿Unos Tostitos preparados o qué?", audio: "Tu voz y un sonido de “ding” al abrir.",
+      esc: [
+        S("0–3 s", "La bolsa cerrada en tu mano, cerca de cámara.", "¿Unos Tostitos preparados o qué?", "¿Tostitos preparados? 🤔"),
+        S("3–8 s", "Rompes la bolsa por arriba y ya viene lleno de aguachile.", "Mira nada más.", "Mira nada más 🔥"),
+        S("8–12 s", "Primer plano de la bolsa con el aderezo.", "TostiAguachile Negro. {PRECIO}.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("¿Unos Tostitos preparados o qué? 🔥"), fijado: "¿Normales o picantes? 👇" },
+    { e: "Con humor", gancho: "Me dijeron que eran unos Tostitos normales.", audio: "Tu voz, tono de sorpresa.",
+      esc: [
+        S("0–3 s", "Cara de “¿en serio?” con la bolsa cerrada.", "Me dijeron que eran unos Tostitos normales.", "“Unos Tostitos normales” 🙄"),
+        S("3–8 s", "Abres la bolsa y cambias a cara de asombro.", "Mentira.", "MENTIRA 😳"),
+        S("8–12 s", "Primer bocado con los ojos cerrados.", "Ya no soy el mismo. {PRECIO}.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("Me dijeron que eran unos Tostitos normales… 😳"), fijado: "Cuéntanos: ¿cuál fue tu primera vez? 👇" },
+    { e: "Cercano", gancho: "¿Sabías que las papas también se preparan?", audio: "Tu voz natural, sin música.",
+      esc: [
+        S("0–4 s", "Mostrar la bolsa y hablar a cámara.", "¿Sabías que a los Tostitos también se les puede echar aguachile?", "¿Lo sabías? 🤷"),
+        S("4–9 s", "Abres la bolsa y echas el camarón con el pepino.", "Así los preparamos aquí, todo fresco.", "Todo fresco"),
+        S("9–13 s", "Entregas la bolsa a cámara.", "Ven a probarlos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("¿Sabías que a los Tostitos también se les puede echar aguachile? 🦐"), fijado: "¿Tú ya los habías probado así? 👇" }
+  ] }); };
+
+/* ============ 9. Primera vez probando ============ */
+FORMATS.primera_vez = function () { return VID({
+  nombre: "Su primera vez probando un TostiAguachile Negro", ev: "i", dur: "12 a 15 s", hora: "7 a 9 pm",
+  porque: "Las reseñas de primera vez son de los formatos más repetidos en TikTok con tostiaguachile (búsqueda web, sin métricas propias).",
+  necesitas: ["Un cliente que acepte salir en el video: pídele permiso antes de grabar.", "Pídele que diga lo primero que sienta, sin prepararlo."],
+  v: [
+    { e: "Directo", gancho: "Su primera vez con un TostiAguachile Negro.", audio: "Sonido real, con música muy bajita.",
+      esc: [
+        S("0–3 s", "El cliente con la bolsa recién entregada, a cámara.", "Su primera vez con un TostiAguachile Negro.", "Primera vez 😳"),
+        S("3–9 s", "Primer bocado, cámara en su cara.", "(Que diga lo que sienta.)", "Reacción real"),
+        S("9–14 s", "Su veredicto a cámara.", "Y tú, ¿ya lo probaste?", "📍 {LUGAR} · {PRECIO}")],
+      desc: D("Su primera vez 😳🔥"), fijado: "¿Cuál fue tu reacción la primera vez? 👇" },
+    { e: "Con humor", gancho: "Le dije que estaba muy picoso. No me creyó.", audio: "Tu voz, tono de “ya verás”.",
+      esc: [
+        S("0–3 s", "Tú, a cámara, con la bolsa ya entregada.", "Le dije que estaba muy picoso. No me creyó.", "No me creyó 😏"),
+        S("3–10 s", "El cliente da el primer bocado y su cara cambia.", "(Reacción real.)", "😳🔥"),
+        S("10–14 s", "Tú, mirando a cámara.", "Se los dije.", "Se los dije 😂")],
+      desc: D("Le dije que picaba. No me creyó 😏"), fijado: "¿Ustedes aguantan el picante? 🌶️" },
+    { e: "Cercano", gancho: "Hoy vino por primera vez y le preguntamos qué le pareció.", audio: "Sonido real del lugar.",
+      esc: [
+        S("0–4 s", "Tú con el cliente, a cámara, de buen modo.", "Hoy vino por primera vez y le preguntamos qué le pareció.", "Su opinión sincera"),
+        S("4–11 s", "Prueba y habla con naturalidad.", "(Que cuente qué le gustó.)", ""),
+        S("11–15 s", "Le agradeces.", "Gracias por venir. Los esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Su opinión sincera 🧡 Gracias por venir."), fijado: "Cuéntanos tu opinión sincera 👇" }
+  ] }); };
+
+/* ============ 10. Avance de la meta ============ */
+FORMATS.avance_meta = function (p) { var nota = p.nota || ""; return VID({
+  nombre: (p.titulo || "Avance de la meta") + ": “Vamos en {N} de {META}”", ev: "f", dur: "12 a 15 s", hora: "Domingo, 2:30 a 4 pm",
+  porque: "Una serie con meta te da algo nuevo que decir cada semana, y la gente vuelve para ver si la lograron.",
+  necesitas: ["Tu número actualizado: míralo en la app Sellos y escríbelo en Mis datos (⚙️).", "La pizarra con el número nuevo."],
+  v: [
+    { e: "Directo", gancho: "Vamos en {N} de {META}.", audio: "Música motivadora y tu voz.",
+      esc: [
+        S("0–3 s", "La pizarra con “{N} / {META}”, de cerca.", "Vamos en {N} de {META}.", "{N} / {META} 🎯"),
+        S("3–9 s", "Cortes del fin de semana: gente, bolsas, la hielera vacía.", "Así estuvo este fin de semana. Gracias.", "Gracias 🧡"),
+        S("9–14 s", "Tú a cámara. " + nota, "Faltan {FALTAN}. ¿Nos ayudas a llegar?", "Faltan {FALTAN}")],
+      desc: D("Vamos en {N} de {META} 🎯 Faltan {FALTAN}. " + nota), fijado: "Faltan {FALTAN}. ¡Tú puedes ayudar! 🙌" },
+    { e: "Con humor", gancho: "Estamos en {N} y todavía no me corto el pelo.", audio: "Tu voz.",
+      esc: [
+        S("0–3 s", "Te tocas el pelo y miras la pizarra.", "Estamos en {N} de {META}. Todavía no me corto el pelo.", "{N} / {META} ✂️"),
+        S("3–9 s", "Sirves una bolsa y se la enseñas a cámara.", "Pero cada bolsa que compran me acerca.", "Cada bolsa suma"),
+        S("9–14 s", "Cara de súplica. " + nota, "Faltan {FALTAN}. Ayúdame 🥺", "Faltan {FALTAN}")],
+      desc: D("{N} de {META}. Todavía no me corto el pelo ✂️ " + nota), fijado: "¿Me corto el pelo o no? 😂" },
+    { e: "Cercano", gancho: "Esta semana les quiero contar cómo vamos.", audio: "Tu voz tranquila.",
+      esc: [
+        S("0–4 s", "Tú, junto a la pizarra.", "Esta semana les quiero contar cómo vamos: {N} de {META}.", "{N} / {META}"),
+        S("4–10 s", "Muestras fotos o clips de clientes (con permiso).", "Esto es gracias a ustedes. Se los agradecemos de verdad.", "Gracias 🧡"),
+        S("10–14 s", "Sonríes. " + nota, "Nos vemos pronto {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Así vamos: {N} de {META} 🧡 Gracias. " + nota), fijado: "Gracias por ser parte de esta meta 🙌" }
+  ] }); };
+
+/* ============ 11. Detrás de cámaras ============ */
+FORMATS.detras = function () { return VID({
+  nombre: "Detrás de cámaras: armar el puesto antes de abrir", ev: "d", dur: "15 a 20 s", hora: "12 a 2 pm",
+  porque: "Los artículos sobre comida callejera destacan el “detrás de cámaras” (escenas reales de lo que nadie ve). No encontré métricas propias, pero es barato de grabar.",
+  necesitas: ["Graba el viernes o el domingo mientras armas o recoges el puesto: sin hacer nada extra.", "Un trípode o apoyar el celular en algo, para el acelerado (time-lapse)."],
+  v: [
+    { e: "Directo", gancho: "Esto es lo que pasa antes de las 11.", audio: "Música animada, sin voz o con poca voz.",
+      esc: [
+        S("0–3 s", "Plano abierto del lugar vacío, todavía sin puesto.", "Esto es lo que pasa antes de las once.", "Antes de las 11 ⏰"),
+        S("3–12 s", "Time-lapse (acelerado) de ti armando: toldo, mesa, hielera, letreros.", "(sin voz)", "Armando el puesto"),
+        S("12–18 s", "El puesto ya listo, y tú detrás con una sonrisa.", "Ya estamos listos. Ven.", "📍 {LUGAR} · {HORARIO}")],
+      desc: D("Antes de las 11 ya estamos aquí 💪"), fijado: "¿A qué hora te levantas tú para trabajar? 👇" },
+    { e: "Con humor", gancho: "Tú: “qué fácil vender aguachiles”. Yo, a las 8 am:", audio: "Un sonido de “drama” de la app y música rápida.",
+      esc: [
+        S("0–3 s", "Tú, cansado, cargando una hielera enorme.", "Tú: “qué fácil vender aguachiles”. Yo a las ocho de la mañana:", "Yo a las 8 am 😅"),
+        S("3–12 s", "Cortes rápidos: cargar, armar toldo, abrir mesa, sacar hielo.", "(sin voz)", "Un día cualquiera"),
+        S("12–18 s", "Sirves una bolsa y suspiras con una sonrisa.", "Pero ya que lo pruebas, vale la pena.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("Lo que nadie ve antes de abrir 😅"), fijado: "Los que trabajan por su cuenta me entienden 🙌" },
+    { e: "Cercano", gancho: "Les enseño cómo preparamos todo antes de abrir.", audio: "Tu voz natural con el sonido del lugar.",
+      esc: [
+        S("0–4 s", "Tú, a cámara, con el lugar todavía vacío.", "Les enseño cómo preparamos todo antes de abrir.", "Así empezamos"),
+        S("4–14 s", "Muestras cada cosa que haces, sin acelerar, con tu voz.", "Primero el toldo, luego las mesas, el hielo y al final las bolsas.", "Paso a paso"),
+        S("14–19 s", "El puesto listo.", "Y a las once, a atenderte. Gracias por venir.", "📍 {LUGAR}")],
+      desc: D("Así empezamos cada día 🧡"), fijado: "Gracias por apoyar a los negocios locales 🙏" }
+  ] }); };
+
+/* ============ 12. Qué lleva ============ */
+FORMATS.que_lleva = function () { return VID({
+  nombre: "Qué lleva un TostiAguachile de {PRECIO}", ev: "i", dur: "20 a 25 s", hora: "12 a 2 pm o 7 a 9 pm",
+  porque: "Mostrar qué trae lo que vendes (precio y porción) es el formato más común en TikTok con tostiaguachile.",
+  necesitas: ["Los ingredientes de tu receta real, cada uno por separado en un plato o charola (ajusta la lista del video a lo que de verdad lleva).", "Un fondo limpio (mesa o tabla)."],
+  v: [
+    { e: "Directo", gancho: "Esto es lo que trae un TostiAguachile Negro.", audio: "Tu voz con música suave.",
+      esc: [
+        S("0–3 s", "Todos los ingredientes en fila sobre la mesa, vista desde arriba.", "Esto es lo que trae un TostiAguachile Negro.", "¿Qué trae? 🧐"),
+        S("3–14 s", "Vas señalando cada ingrediente con el dedo, uno por uno.", "Camarón. Pepino. Cebolla morada. Limón. Aguacate. Aderezo negro. Ajonjolí. Y las papas.", "(el nombre de cada uno)"),
+        S("14–20 s", "Armas la bolsa sin cortes, rápido.", "Todo preparado al momento.", "Preparado al momento"),
+        S("20–24 s", "La bolsa servida a cámara.", "{PRECIO}. {LUGAR}.", "{PRECIO} · 📍 {LUGAR}")],
+      desc: D("Esto es lo que trae tu TostiAguachile Negro 🦐"), fijado: "¿Qué le agregarías tú? 👇" },
+    { e: "Con humor", gancho: "¿Qué lleva? Todo lo bueno de la vida.", audio: "Tu voz, tono de presentador.",
+      esc: [
+        S("0–3 s", "Tú presentando la mesa como en un programa.", "¿Qué lleva un TostiAguachile Negro? Todo lo bueno de la vida.", "Todo lo bueno 😎"),
+        S("3–15 s", "Señalas cada ingrediente con ritmo (puedes poner un “ding” por cada uno).", "Camarón, ¡ding! Pepino, ¡ding! Cebolla morada, ¡ding! Aguacate, ¡ding! Aderezo negro, ¡ding!", "ding ✨"),
+        S("15–21 s", "Armas la bolsa mientras suena música.", "Y lo mejor: lo armamos frente a ti.", "En vivo"),
+        S("21–25 s", "Muestras la bolsa terminada.", "{PRECIO}. Ven por el tuyo.", "📍 {LUGAR}")],
+      desc: D("¿Qué lleva? Todo lo bueno 😎"), fijado: "¿Cuál es tu ingrediente favorito? 👇" },
+    { e: "Cercano", gancho: "Les cuento qué lleva y por qué cuesta {PRECIO}.", audio: "Tu voz natural, sin música.",
+      esc: [
+        S("0–5 s", "Tú, con los ingredientes al frente, a cámara.", "Les cuento qué lleva un TostiAguachile Negro y por qué cuesta {PRECIO}.", "¿Por qué {PRECIO}?"),
+        S("5–17 s", "Muestras cada ingrediente mientras explicas.", "El camarón es fresco y es lo más caro. El pepino y la cebolla los picamos ese día, y el aderezo es nuestro.", "Fresco · picado ese día"),
+        S("17–22 s", "Armas la bolsa con calma.", "Todo junto en una bolsa de Tostitos, normal o picante.", "Normal o picante"),
+        S("22–25 s", "Sonríes y la entregas.", "Te esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Qué lleva y por qué cuesta {PRECIO} 🧡"), fijado: "¿Alguna otra duda del menú? 👇" }
+  ] }); };
+
+/* ============ 13. Reacciones (3 primeras mordidas) ============ */
+FORMATS.reacciones = function () { return VID({
+  nombre: "Reacciones: 3 personas, 3 primeras mordidas", ev: "i", dur: "15 a 20 s", hora: "7 a 9 pm",
+  porque: "Es un formato de reseña (de los más comunes con tostiaguachile) y además lo comparten los mismos que salen.",
+  necesitas: ["3 clips de 4 a 5 segundos de tres clientes distintos (pide permiso a cada uno).", "Graba durante el sábado y junta los clips al editar."],
+  v: [
+    { e: "Directo", gancho: "3 personas, 3 primeras mordidas.", audio: "Música rápida de fondo.",
+      esc: [
+        S("0–2 s", "Pantalla con texto grande sobre los tres clips en miniatura.", "Tres personas, tres primeras mordidas.", "3 PERSONAS · 3 MORDIDAS"),
+        S("2–14 s", "Tres clips seguidos de 4 segundos: primer bocado de cada uno.", "(sin voz, que se oiga la reacción)", "#1 · #2 · #3"),
+        S("14–19 s", "Una toma de tu puesto.", "Ven a probar el tuyo.", "📍 {LUGAR} · {PRECIO}")],
+      desc: D("Tres personas, tres primeras mordidas 😋"), fijado: "¿Con cuál te identificas? 👇" },
+    { e: "Con humor", gancho: "Calificación del 1 al 10, sin mentir.", audio: "Un sonido de “aplausos” al final.",
+      esc: [
+        S("0–2 s", "Tú, serio, con una libreta.", "Calificación del uno al diez. Sin mentir.", "Del 1 al 10 📝"),
+        S("2–14 s", "Tres clips, y después de cada primer bocado, pones la calificación del cliente con texto.", "(que cada cliente diga su número)", "9 · 10 · 10"),
+        S("14–19 s", "Tú, mostrando la libreta con un “promedio”.", "Promedio: nueve y medio. Ven a probarlo.", "Promedio 9.5 ⭐")],
+      desc: D("Calificación real, sin mentir ⭐"), fijado: "¿Tú qué calificación le darías? 👇" },
+    { e: "Cercano", gancho: "Les pregunté qué les pareció. Esto dijeron.", audio: "Sonido real, con música muy suave.",
+      esc: [
+        S("0–3 s", "Tú, a cámara con los clientes al fondo.", "Les pregunté qué les pareció. Esto dijeron.", "Esto dijeron 🧡"),
+        S("3–15 s", "Tres respuestas cortas, una por cliente, mirando a cámara.", "(cada uno con sus palabras)", "Sus palabras"),
+        S("15–19 s", "Tú, agradeciendo.", "Gracias por venir. Aquí seguimos.", "📍 {LUGAR}")],
+      desc: D("Esto dicen de nuestros TostiAguachiles 🧡 Gracias."), fijado: "Gracias a los que vinieron 🙏" }
+  ] }); };
+
+/* ============ 14. Resumen de 3 semanas ============ */
+FORMATS.resumen = function () { return VID({
+  nombre: "Resumen: “Esto vendimos en 3 semanas”", ev: "f", dur: "20 a 25 s", hora: "Lunes, 12 a 2 pm",
+  porque: "Las historias con números reales generan confianza y le dan cierre a la serie con meta.",
+  necesitas: ["Tus números de la app Sellos: aguachiles vendidos, kg de camarón usados, clientes con tarjeta.", "La pizarra con el número final del resumen."],
+  v: [
+    { e: "Directo", gancho: "En 3 semanas hicimos esto.", audio: "Música motivadora y tu voz.",
+      esc: [
+        S("0–3 s", "Tú, a cámara, con la pizarra al frente.", "En tres semanas hicimos esto.", "3 SEMANAS 🙌"),
+        S("3–14 s", "Muestras cada número con texto grande, uno por uno.", "Vendimos {N} aguachiles, usamos (kg de camarón) kilos de camarón y ya tenemos (clientes) clientes con tarjeta de sellos.", "{N} aguachiles · (kg) kg · (clientes) tarjetas"),
+        S("14–22 s", "Cortes del fin de semana.", "Gracias por cada bolsa. Seguimos.", "Gracias 🧡"),
+        S("22–25 s", "Cierras mirando a cámara.", "Los esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("3 semanas, {N} aguachiles. Gracias 🧡 (cambia los números por los reales)"), fijado: "¿Ya fuiste? Cuéntanos tu experiencia 👇" },
+    { e: "Con humor", gancho: "En 3 semanas aprendí que el camarón no se pela solo.", audio: "Tu voz, tono de reflexión.",
+      esc: [
+        S("0–4 s", "Tú, con cara de cansado y una bolsa de camarón.", "En tres semanas aprendí que el camarón no se pela solo.", "Lo que aprendí 😅"),
+        S("4–15 s", "Texto en pantalla con números, y cortes de lo que más trabajo da.", "También aprendí que vendimos {N} aguachiles.", "{N} aguachiles 🎉"),
+        S("15–21 s", "Sirves una bolsa y la levantas.", "Y que valió la pena cada uno.", "Valió la pena"),
+        S("21–25 s", "Cierras con una sonrisa.", "Gracias. Nos vemos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("3 semanas, {N} aguachiles y muchas lecciones 😅 (cambia los números por los reales)"), fijado: "¿Qué crees que aprendí en la semana 4? 😂" },
+    { e: "Cercano", gancho: "Quiero darles las gracias con números.", audio: "Tu voz tranquila.",
+      esc: [
+        S("0–5 s", "Tú, sentado, a cámara.", "Quiero darles las gracias con números. En tres semanas vendimos {N} aguachiles.", "{N} aguachiles"),
+        S("5–15 s", "Muestras fotos de clientes (con permiso) y del puesto.", "Cada uno de ustedes lo hizo posible. Nos tienen aquí, con ganas.", "Gracias por todo 🧡"),
+        S("15–21 s", "Vuelves a cámara.", "Esto apenas empieza. Los espero.", "Esto apenas empieza")],
+      desc: D("Gracias con números: {N} aguachiles en 3 semanas 🧡 (cambia el número por el real)"), fijado: "Gracias, de corazón 🙏" }
+  ] }); };
+
+/* ============ 15. Proceso: 50 aguachiles en una hora ============ */
+FORMATS.proceso50 = function () { return VID({
+  nombre: "Proceso: así sacamos 50 aguachiles en una hora", ev: "d", dur: "15 a 20 s", hora: "12 a 2 pm",
+  porque: "Los videos de proceso en acelerado funcionan en comida callejera (según artículos; sin métricas propias del nicho).",
+  necesitas: ["Apoya el celular fijo en un lugar donde veas todo el trabajo.", "Un contador en pantalla (con texto) que suba de 1 a 50 mientras avanza el acelerado."],
+  v: [
+    { e: "Directo", gancho: "50 aguachiles en una hora. Mira.", audio: "Música rápida.",
+      esc: [
+        S("0–3 s", "Mesa llena de bolsas abiertas vista desde arriba.", "Cincuenta aguachiles en una hora. Mira.", "50 en 1 hora ⏱️"),
+        S("3–15 s", "Time-lapse: tú sirviendo bolsa tras bolsa; el contador sube de 1 a 50 en texto.", "(sin voz)", "1… 10… 25… 50"),
+        S("15–19 s", "Una bolsa terminada de cerca.", "Y cada una se prepara al momento.", "Hecho al momento")],
+      desc: D("50 aguachiles en una hora ⏱️"), fijado: "¿Cuánto crees que tardas tú en uno? 😅" },
+    { e: "Con humor", gancho: "Yo intentando no cometer errores con 20 personas en fila.", audio: "Música de “prisa” de la app.",
+      esc: [
+        S("0–3 s", "Fila larga y tú, en modo serio.", "Yo intentando no cometer errores con veinte personas en la fila.", "Modo prisa 😰"),
+        S("3–15 s", "Time-lapse con contador subiendo; un cliente te saluda y tú sigues sin parar.", "(sin voz)", "Subiendo… 50"),
+        S("15–19 s", "Terminas y exhalas a cámara.", "Cincuenta. Sin errores. O casi.", "Misión cumplida ✅")],
+      desc: D("Modo prisa activado 😰 50 aguachiles en una hora."), fijado: "¿Eres de los que esperan en la fila? 😂" },
+    { e: "Cercano", gancho: "Así se ve una hora de trabajo en el puesto.", audio: "Tu voz tranquila sobre el acelerado.",
+      esc: [
+        S("0–4 s", "Tú, a cámara, antes de empezar.", "Así se ve una hora de trabajo en el puesto.", "Una hora de trabajo"),
+        S("4–15 s", "Time-lapse de todo el proceso con el contador.", "Cada bolsa se hace con cariño, una por una.", "50 bolsas"),
+        S("15–19 s", "Tú, sonriendo.", "Gracias por la paciencia. Vale la pena.", "📍 {LUGAR}")],
+      desc: D("Una hora de trabajo, 50 aguachiles 🧡"), fijado: "Gracias por la paciencia en la fila 🙏" }
+  ] }); };
+
+/* ============ 16. Curiosidad: ¿verdes o rojos? ============ */
+FORMATS.curiosidad_voto = function () { return VID({
+  nombre: "Curiosidad: ¿Tostitos verdes o rojos?", ev: "c", dur: "10 a 13 s", hora: "7 a 9 pm",
+  porque: "Una pregunta con dos opciones invita a comentar, y los comentarios ayudan al video. Tu flyer ya ofrece “normales o picantes”.",
+  necesitas: ["Una bolsa verde (Salsa Verde) y una roja (Xtra Flamin’ Hot).", "Después sigue la respuesta en historias, con encuesta."],
+  v: [
+    { e: "Directo", gancho: "¿Tostitos verdes o rojos? Tú decides.", audio: "Tu voz con un “ding” al mostrar cada bolsa.",
+      esc: [
+        S("0–3 s", "Una bolsa verde en una mano y una roja en la otra.", "¿Tostitos verdes o rojos? Tú decides.", "¿Verdes o rojos? 🤔"),
+        S("3–9 s", "Abres cada una y muestras cómo queda el aguachile.", "Los verdes, normales. Los rojos, picantes.", "Verdes = normal · Rojos = picante"),
+        S("9–12 s", "Señalas hacia abajo.", "Dime cuál en comentarios.", "Cuéntanos 👇")],
+      desc: D("¿Verdes o rojos? Cuéntanos 👇"), fijado: "Verdes o rojos, ¡tú decides! 🌶️" },
+    { e: "Con humor", gancho: "Esto divide familias: ¿verdes o rojos?", audio: "Un sonido de “duelo” de la app.",
+      esc: [
+        S("0–3 s", "Tú, serio, con cada bolsa en una mano.", "Esto divide familias: ¿verdes o rojos?", "Verdes vs. rojos ⚔️"),
+        S("3–9 s", "Vas alternando entre bolsas con cara de “yo prefiero este”.", "Yo ya elegí, pero no les voy a decir cuál.", "No te lo digo 🤐"),
+        S("9–12 s", "Los miras a cámara.", "Voten.", "Voten en comentarios 👇")],
+      desc: D("Esto divide familias ⚔️ ¿Verdes o rojos?"), fijado: "Voten, y yo cuento los votos 🙌" },
+    { e: "Cercano", gancho: "Les pregunto algo: ¿qué prefieren?", audio: "Tu voz natural.",
+      esc: [
+        S("0–4 s", "Tú con las dos bolsas, a cámara.", "Les pregunto algo, de verdad. ¿Qué prefieren, verdes o rojos?", "¿Qué prefieres?"),
+        S("4–9 s", "Muestras ambas bolsas y cómo cambia el sabor.", "Los verdes, más suaves. Los rojos, para los que aguantan picante.", "Suave vs. picante"),
+        S("9–12 s", "Sonríes.", "Cuéntenme, me interesa.", "Cuéntanos 👇")],
+      desc: D("¿Verdes o rojos? Me interesa tu opinión 🧡"), fijado: "Cuéntanos tu favorito 👇" }
+  ] }); };
+
+/* ============ 17. Fecha local (12 de diciembre) ============ */
+FORMATS.fecha_local = function () { return VID({
+  nombre: "Fecha local: 12 de diciembre, antojo después del camino", ev: "h", dur: "15 a 18 s", hora: "11 am a 3 pm (durante la venta)",
+  porque: "Un video de la Feria San Martín Texmelucan llegó a 25 mil vistas, así que los eventos locales atraen. El 12 de diciembre es fecha grande en Puebla.",
+  necesitas: ["Confirma tu horario del sábado 12 antes de publicar.", "Tono respetuoso: es una fecha religiosa importante, no hagas bromas sobre ella.", "Graba el puesto con calma, con la gente que pase."],
+  v: [
+    { e: "Directo", gancho: "12 de diciembre: abrimos como siempre.", audio: "Música tranquila o sonido ambiente.",
+      esc: [
+        S("0–3 s", "El puesto abierto, con gente pasando al fondo.", "Doce de diciembre. Abrimos como siempre.", "12 de diciembre 🙏"),
+        S("3–11 s", "Preparas una bolsa con calma.", "Para los que andan en el camino, aquí hay un antojo esperándolos.", "Un antojo en el camino"),
+        S("11–17 s", "Entregas la bolsa.", "{LUGAR}, hasta las tres.", "📍 {LUGAR}")],
+      desc: D("12 de diciembre 🙏 Abrimos como siempre."), fijado: "Que tengan un día muy bonito 🧡" },
+    { e: "Con humor (respetuoso)", gancho: "Después del camino, el antojo también cuenta.", audio: "Tu voz amable.",
+      esc: [
+        S("0–3 s", "Tú, sonriendo, con el puesto detrás.", "Después de tanto caminar, el antojo también cuenta.", "El antojo cuenta 😌"),
+        S("3–11 s", "Armas una bolsa, con calma.", "Ven a descansar un ratito y a comer algo rico.", "Descansa y come"),
+        S("11–17 s", "Cierras entregando la bolsa.", "Te esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Después de caminar, un buen antojo 😌"), fijado: "¿Quién camina hoy? 🙏" },
+    { e: "Cercano", gancho: "Hoy es un día especial para todos.", audio: "Tu voz tranquila, con música suave.",
+      esc: [
+        S("0–4 s", "Tú, a cámara, con calma.", "Hoy es un día especial para muchos de nosotros.", "Un día especial 🙏"),
+        S("4–12 s", "Muestras el puesto y la gente que llega.", "Aquí estamos para atenderte, como siempre, con cariño.", "Con cariño"),
+        S("12–17 s", "Sonríes.", "Pásate, hasta las tres. Que tengas un bonito día.", "📍 {LUGAR}")],
+      desc: D("Un día especial 🙏 Aquí estamos para atenderte."), fijado: "Que Dios los bendiga 🙏" }
+  ] }); };
+
+/* ============ 18. Cómo se arma una charola ============ */
+FORMATS.charola_proceso = function () { return VID({
+  nombre: "Pedidos: así se arma una charola para una posada", ev: "d", dur: "20 a 25 s", hora: "12 a 2 pm",
+  porque: "Es un producto nuevo para diciembre: otra cuenta de aguachiles en Facebook ya ofrece “charola de aguachile”. Mostrar el proceso da confianza.",
+  necesitas: ["Una charola grande armada de verdad (pruébala antes en casa).", "Antes de publicar: define tamaños y precios y ponlos en la descripción. No los inventé; son tuyos.", "Número de WhatsApp para pedidos."],
+  v: [
+    { e: "Directo", gancho: "Así se arma una charola para tu posada.", audio: "Música alegre de posada.",
+      esc: [
+        S("0–3 s", "La charola vacía, de cerca.", "Así se arma una charola para tu posada.", "Charola para posadas 🎄"),
+        S("3–16 s", "Time-lapse: capas de papas, camarón, pepino, cebolla, aguacate y aderezo.", "(sin voz)", "Capa por capa"),
+        S("16–22 s", "La charola terminada, en cámara lenta.", "Para cuando vienen muchos y alcanza para todos.", "Alcanza para todos"),
+        S("22–25 s", "Tú, a cámara.", "Pedidos con dos días de anticipación: {WA}.", "Pedidos: {WA}")],
+      desc: D("Charolas para tus posadas 🎄 Pedidos con 2 días de anticipación. (Agrega aquí tamaños y precios.)"), fijado: "¿Para cuántas personas la quieres? 👇" },
+    { e: "Con humor", gancho: "Cuando te toca llevar “algo” a la posada.", audio: "Un villancico de la biblioteca, subido de tono.",
+      esc: [
+        S("0–3 s", "Tú, con cara de apuro y las manos vacías.", "Cuando te toca llevar “algo” a la posada.", "Te tocó llevar algo 😅"),
+        S("3–16 s", "Corte a una charola armándose en acelerado.", "(sin voz)", "Solución: ¡charola! 🎉"),
+        S("16–22 s", "Entregas la charola a alguien que la recibe feliz.", "Resuelto. Todos contentos.", "Resuelto ✅"),
+        S("22–25 s", "Tú, a cámara.", "Pedidos: {WA}.", "Pedidos: {WA}")],
+      desc: D("¿Te tocó llevar algo a la posada? Charola de aguachile 🎄"), fijado: "Etiqueta a quien siempre llega con las manos vacías 😂" },
+    { e: "Cercano", gancho: "Esta temporada, llevamos el antojo a tu posada.", audio: "Tu voz tranquila.",
+      esc: [
+        S("0–4 s", "Tú, junto a la charola.", "Esta temporada también llevamos el antojo a tu posada.", "Tu posada 🎄"),
+        S("4–17 s", "Armas la charola mientras explicas.", "La armamos el mismo día, con el camarón fresco y todo lo que lleva.", "Hecha el mismo día"),
+        S("17–25 s", "Muestras la charola terminada.", "Pídela con dos días de anticipación por WhatsApp: {WA}.", "Pedidos: {WA}")],
+      desc: D("Charolas para tus posadas 🎄 Pedidos con 2 días de anticipación. (Agrega aquí tamaños y precios.)"), fijado: "Escríbenos para apartar la tuya 🙌" }
+  ] }); };
+
+/* ============ 19. Entrega a la posada ============ */
+FORMATS.posada = function () { return VID({
+  nombre: "Temporada: lleva el antojo a tu posada", ev: "h", dur: "15 a 20 s", hora: "7 a 9 pm",
+  porque: "Las posadas empiezan el 16 de diciembre y llevar comida es una necesidad real de esa temporada.",
+  necesitas: ["Una charola o varias bolsas para entregar (con permiso de quien reciba, si sale en el video).", "Si haces envíos: la dirección o zona (San Martín, Texmelucan centro y alrededores)."],
+  v: [
+    { e: "Directo", gancho: "Lleva el antojo a tu posada.", audio: "Música de posada.",
+      esc: [
+        S("0–3 s", "Tú entrando a una fiesta con la charola.", "Lleva el antojo a tu posada.", "Tu posada 🎄"),
+        S("3–11 s", "La charola en la mesa y la gente sirviéndose.", "(sin voz)", "Todos contentos"),
+        S("11–16 s", "Tú, a cámara.", "Envíos en San Martín y Texmelucan centro. Pide por WhatsApp: {WA}.", "Pedidos: {WA}")],
+      desc: D("Lleva el antojo a tu posada 🎄 Envíos en San Martín y Texmelucan centro."), fijado: "¿Dónde es tu posada? 👇" },
+    { e: "Con humor", gancho: "El héroe de la posada eres tú, y no cocinaste nada.", audio: "Un villancico de la biblioteca.",
+      esc: [
+        S("0–3 s", "Cara de orgullo al entrar con la charola.", "El héroe de la posada eres tú. Y no cocinaste nada.", "El héroe 🦸"),
+        S("3–11 s", "La gente aplaude cuando ve la charola.", "(sin voz)", "👏"),
+        S("11–16 s", "Tú, guiñando a cámara.", "Pídela por WhatsApp: {WA}.", "Pedidos: {WA}")],
+      desc: D("El héroe de la posada eres tú 🦸 Pide tu charola."), fijado: "¿Quién es el héroe de tu posada? 😂" },
+    { e: "Cercano", gancho: "Gracias por dejarnos ser parte de tu posada.", audio: "Tu voz con música suave.",
+      esc: [
+        S("0–4 s", "Tú, entregando una charola a alguien.", "Gracias por dejarnos ser parte de tu posada.", "Gracias 🧡"),
+        S("4–12 s", "La charola en la mesa y la familia sirviéndose.", "Es un gusto llegar a tu casa con algo rico.", "Con cariño"),
+        S("12–16 s", "Tú, sonriendo.", "Pide la tuya por WhatsApp: {WA}.", "Pedidos: {WA}")],
+      desc: D("Gracias por dejarnos ser parte de tu posada 🧡"), fijado: "Gracias por confiar en nosotros 🙏" }
+  ] }); };
+
+/* ============ 20. Cierre del mes ============ */
+FORMATS.cierre = function () { return VID({
+  nombre: "Cierre del mes: “Llegamos a {N} de {META}”", ev: "f", dur: "20 a 25 s", hora: "12 a 2 pm",
+  porque: "Cierra la serie con meta que empezó el 25 de noviembre. Cumplida o no, es un momento para agradecer y anunciar lo que sigue.",
+  necesitas: ["Tu número final, escrito en Mis datos (⚙️).", "Un clip de cada fin de semana del mes para el repaso (los que más te gusten).", "Decide qué anunciar para enero o la siguiente meta."],
+  v: [
+    { e: "Directo", gancho: "Llegamos a {N} de {META}.", audio: "Música motivadora.",
+      esc: [
+        S("0–3 s", "La pizarra con “{N} / {META}”, cerca.", "Llegamos a {N} de {META}.", "{N} / {META} 🎉"),
+        S("3–15 s", "Repaso: un clip de cada fin de semana, rápido.", "Cuatro semanas, muchos clientes, muchas bolsas.", "4 semanas 🙌"),
+        S("15–22 s", "Tú a cámara.", "Gracias. Esto apenas empieza. Sigan atentos.", "Gracias 🧡"),
+        S("22–25 s", "Señalas hacia abajo.", "Los esperamos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("Llegamos a {N} de {META} 🎉 Gracias por todo. (Anuncia aquí lo que sigue.)"), fijado: "¿Qué quieren ver el próximo mes? 👇" },
+    { e: "Con humor", gancho: "Ya puedo contarles si me corté el pelo.", audio: "Tu voz.",
+      esc: [
+        S("0–4 s", "Tú, tocándote el pelo, nervioso.", "Ya puedo contarles si me corté el pelo.", "¿Me corté el pelo? ✂️"),
+        S("4–15 s", "Muestras la pizarra con el número final.", "Llegamos a {N} de {META}.", "{N} / {META}"),
+        S("15–22 s", "Reaccionas con una cara según el resultado (feliz o dramático).", "(la reacción real)", "Resultado 🎬"),
+        S("22–25 s", "Cierras con una sonrisa.", "Gracias. Nos vemos {LUGAR}.", "📍 {LUGAR}")],
+      desc: D("¿Me corté el pelo o no? ✂️ Llegamos a {N} de {META}."), fijado: "Adivinen qué pasó 👇" },
+    { e: "Cercano", gancho: "Este mes lo hicimos juntos.", audio: "Tu voz tranquila.",
+      esc: [
+        S("0–5 s", "Tú, a cámara, con la pizarra al lado.", "Este mes lo hicimos juntos. Llegamos a {N} de {META}.", "Lo hicimos juntos 🧡"),
+        S("5–16 s", "Fotos y clips de los clientes del mes (con permiso).", "Cada persona que vino hizo esto posible.", "Gracias"),
+        S("16–25 s", "Tú, agradeciendo.", "Gracias de corazón. Seguimos con más ganas.", "Gracias de corazón")],
+      desc: D("Lo hicimos juntos: {N} de {META} 🧡 Gracias. (Anuncia aquí lo que sigue.)"), fijado: "Gracias por un mes increíble 🙏" }
+  ] }); };
+
+/* =====================================================================
+   FLYERS, FOTOS, HISTORIAS, MARKETPLACE Y TAREAS
+   ===================================================================== */
+var PLAT_F = "Instagram (publicación) · Facebook (publicación)";
+var PIE_F = [
+  "Sube la imagen al generador de imágenes con IA (ChatGPT, Gemini, etc.) y pega el prompt completo.",
+  "Revisa que el logo, los colores y la letra sean idénticos al flyer original. Si algo cambió, pega otra vez el prompt agregando: “No cambies el logo ni la tipografía, deja todo igual excepto lo que te pedí”.",
+  "Revisa que el texto no tenga faltas de ortografía (la IA a veces se equivoca en las letras). Si falla, vuelve a pedirlo o corrígelo en el editor del celular.",
+  "Descarga la imagen, súbela y pega la descripción."
+];
+var REF_BASE = "Usa la imagen de referencia (flyer). No cambies el logo, ni la tipografía, ni los colores, ni la posición de los elementos, ni ningún otro detalle del diseño.";
+function REF(cambios, extra) { return REF_BASE + "\nAhora cámbiale: " + cambios + (extra ? "\n" + extra : "") + "\nFormato vertical 4:5 (1080×1350 px)."; }
+function REF2(cambios) {
+  return "Te estoy subiendo 2 imágenes.\nImagen 1 = el flyer de referencia. Imagen 2 = la foto real del producto.\n" +
+    "Usa la imagen 1 (flyer) como base. No cambies el logo, ni la tipografía, ni los colores, ni la posición de los elementos, ni ningún otro detalle del diseño.\n" +
+    "Ahora cámbiale: " + cambios + "\nFormato vertical 4:5 (1080×1350 px).";
+}
+function FLY(o) { o.t = "flyer"; o.plat = o.plat || PLAT_F; o.pie = o.pie || PIE_F; return o; }
+function HIS(o) { o.t = "hist"; o.plat = o.plat || "Historias de Instagram · Historias de Facebook · Estados de WhatsApp"; o.pie = o.pie || [
+  "Formato vertical 9:16. Cada lámina dura 5 segundos, así que el texto debe ser corto.",
+  "Pon el texto con la herramienta de texto de la historia y el sticker (encuesta, pregunta, ubicación) desde el menú de stickers.",
+  "Las historias duran 24 horas: publícalas a la hora indicada."
+]; return o; }
+function FOT(o) { o.t = "foto"; o.plat = o.plat || PLAT_F; o.pie = o.pie || [
+  "Luz del día, cerca de una ventana o al aire libre; nunca con flash.",
+  "Limpia el lente y la bolsa (sin gotas ni manchas en el borde).",
+  "Toma 5 fotos y elige la mejor; casi siempre es la tercera."
+]; return o; }
+function MKT(o) { o.t = "mk"; o.plat = "Facebook Marketplace"; o.pie = o.pie || [
+  "Facebook puede rechazar o quitar anuncios de comida preparada. Si pasa, no insistas: avísame y lo cambiamos por otra cosa.",
+  "Sube de 3 a 5 fotos (la bolsa de cerca, el puesto, el letrero de {PRECIO}).",
+  "Responde los mensajes en menos de una hora: Marketplace premia las respuestas rápidas."
+]; return o; }
+function TAR(o) { o.t = "tarea"; o.plat = o.plat || "Tarea"; o.pie = o.pie || []; return o; }
+
+/* ============ Flyer: cuenta regresiva ============ */
+FORMATS.flyer_cuenta = function (p) { var f = p.fecha || "mañana"; return FLY({
+  nombre: "Flyer: cuenta regresiva (¡mañana abrimos!)", ev: "a", hora: "7 a 9 pm",
+  porque: "Avisar un día antes que abres hace que tus seguidores ya vengan con antojo. Reutilizas tu flyer, así no pierdes tiempo.",
+  subir: "Sube 1 imagen: tu flyer original (el que tiene el logo).",
+  necesitas: ["Tu flyer original en el celular (el mismo que usas siempre).", "Una cuenta de IA para imágenes (ChatGPT o Gemini)."],
+  v: [
+    { e: "Directo", prompt: REF("el texto principal por «¡MAÑANA ABRIMOS!» y debajo, en letra más pequeña, «" + f + " · de 11:00 am a 3:00 pm · {LUGAR}». Quita cualquier otro texto de horarios."),
+      texto: ["¡MAÑANA ABRIMOS!", f + " · de 11:00 am a 3:00 pm", "{LUGAR}"],
+      desc: D("¡Mañana abrimos! 🔥 Te esperamos de 11 a 3."), fijado: "¿Quién viene mañana? 🙋" },
+    { e: "Con humor", prompt: REF("el texto principal por «FALTAN 24 HORAS PARA TU ANTOJO» y debajo, en letra más pequeña, «" + f + " · {LUGAR} · de 11:00 am a 3:00 pm». Mantén el estilo y el tamaño de la letra original."),
+      texto: ["FALTAN 24 HORAS PARA TU ANTOJO", f + " · {LUGAR}", "11:00 am a 3:00 pm"],
+      desc: D("Faltan 24 horas para tu antojo 😋 Ve apartando el lugar en tu estómago."), fijado: "Avísale a quien siempre pide “uno para probar” 😂" },
+    { e: "Cercano", prompt: REF("el texto principal por «Mañana nos vemos 🧡» y debajo, en letra más pequeña, «Abrimos " + f + " de 11:00 am a 3:00 pm · {LUGAR}»."),
+      texto: ["Mañana nos vemos 🧡", "Abrimos " + f + " de 11:00 am a 3:00 pm", "{LUGAR}"],
+      desc: D("Mañana nos vemos 🧡 Los esperamos con todo el cariño."), fijado: "Gracias por apoyar a un negocio local 🙏" }
+  ] }); };
+
+/* ============ Flyer: charolas para posadas (2 imágenes) ============ */
+FORMATS.flyer_charolas = function () { return FLY({
+  nombre: "Flyer: charolas para tus posadas", ev: "h", hora: "12 a 2 pm",
+  porque: "Es tu producto nuevo de diciembre. Otra cuenta de aguachiles en Facebook ya ofrece charolas, y las posadas empiezan el 16.",
+  subir: "Sube 2 imágenes, en este orden: Imagen 1 = tu flyer original (con el logo). Imagen 2 = una foto real de la charola ya armada.",
+  necesitas: ["Una foto real de la charola (luz del día, vista desde arriba).", "Tamaños y precios de tus charolas (son tuyos, yo no los inventé): escríbelos donde dice [ ] antes de pegar el prompt."],
+  v: [
+    { e: "Directo", prompt: REF2("el texto principal por «CHAROLAS PARA TUS POSADAS 🎄». Reemplaza la foto de la bolsa por la foto de la charola de la imagen 2, sin alterarla (que se vea tal cual es). Abajo agrega, en letra pequeña: «[TAMAÑOS Y PRECIOS] · Pedidos con 2 días de anticipación · WhatsApp {WA}»."),
+      texto: ["CHAROLAS PARA TUS POSADAS 🎄", "[TAMAÑOS Y PRECIOS]", "Pedidos con 2 días de anticipación", "WhatsApp {WA}"],
+      desc: D("Charolas para tus posadas 🎄 Pedidos con 2 días de anticipación por WhatsApp: {WA}. [Agrega tamaños y precios]"), fijado: "¿Para cuántas personas la quieres? 👇" },
+    { e: "Con humor", prompt: REF2("el texto principal por «¿TE TOCÓ LLEVAR ALGO A LA POSADA?» y debajo, más grande que el resto: «Llévate una charola de aguachile». Reemplaza la foto de la bolsa por la foto de la charola de la imagen 2, sin alterarla. Abajo agrega, en letra pequeña: «[TAMAÑOS Y PRECIOS] · Pedidos con 2 días de anticipación · WhatsApp {WA}»."),
+      texto: ["¿TE TOCÓ LLEVAR ALGO A LA POSADA?", "Llévate una charola de aguachile", "[TAMAÑOS Y PRECIOS]", "WhatsApp {WA}"],
+      desc: D("¿Te tocó llevar algo a la posada? 😅 Charola de aguachile, lista para compartir. Pedidos con 2 días de anticipación."), fijado: "Etiqueta al que siempre llega sin nada 😂" },
+    { e: "Cercano", prompt: REF2("el texto principal por «Tu posada, con más sabor 🧡» y debajo, en letra más pequeña: «Charolas de aguachile hechas el mismo día». Reemplaza la foto de la bolsa por la foto de la charola de la imagen 2, sin alterarla. Abajo agrega: «[TAMAÑOS Y PRECIOS] · Pedidos con 2 días de anticipación · WhatsApp {WA}»."),
+      texto: ["Tu posada, con más sabor 🧡", "Charolas de aguachile hechas el mismo día", "[TAMAÑOS Y PRECIOS]", "WhatsApp {WA}"],
+      desc: D("Tu posada, con más sabor 🧡 Hacemos tu charola el mismo día. Pídela por WhatsApp: {WA}."), fijado: "Escríbenos para apartar la tuya 🙌" }
+  ] }); };
+
+/* ============ Flyer: contador de la meta ============ */
+FORMATS.flyer_contador = function () { return FLY({
+  nombre: "Flyer: marcador de la meta (“{N} de {META}”)", ev: "f", hora: "Domingo, 2:30 a 4 pm",
+  porque: "Un marcador que cambia cada semana le da a la gente una razón para volver a ver tu cuenta. Lo actualizas en 5 minutos.",
+  subir: "Sube 1 imagen: tu flyer original (con el logo). Si ya hiciste el marcador la semana pasada, sube ese en lugar del original.",
+  necesitas: ["Tu número de aguachiles vendidos (míralo en la app Sellos y escríbelo en Mis datos ⚙️).", "Una cuenta de IA para imágenes."],
+  v: [
+    { e: "Directo", prompt: REF("el texto principal por «{N} / {META} AGUACHILES» y agrega debajo una barra de progreso horizontal, llena hasta el {PCT}%, con los mismos colores de la marca. Abajo, en letra pequeña: «Faltan {FALTAN} · Gracias por ayudarnos a llegar»."),
+      texto: ["{N} / {META} AGUACHILES", "Faltan {FALTAN}", "Gracias por ayudarnos a llegar"],
+      desc: D("Vamos en {N} de {META} 💪 Faltan {FALTAN}. Gracias por cada bolsa."), fijado: "¿Crees que llegamos a la meta? 👇" },
+    { e: "Con humor", prompt: REF("el texto principal por «YA VAMOS EN {N} DE {META}… ¿ME CORTO EL PELO?» y agrega debajo una barra de progreso horizontal, llena hasta el {PCT}%, con los mismos colores de la marca. Abajo, en letra pequeña: «Faltan {FALTAN} aguachiles»."),
+      texto: ["YA VAMOS EN {N} DE {META}… ¿ME CORTO EL PELO?", "Faltan {FALTAN} aguachiles"],
+      desc: D("Faltan {FALTAN} aguachiles para la meta 😅 Y yo ya estoy pensando en el peinado."), fijado: "Apuesten: ¿llego o no llego? 👇" },
+    { e: "Cercano", prompt: REF("el texto principal por «Vamos {N} de {META}, gracias a ti 🧡» y agrega debajo una barra de progreso horizontal, llena hasta el {PCT}%, con los mismos colores de la marca. Abajo, en letra pequeña: «Nos faltan {FALTAN}. ¡Nos vemos este fin de semana!»."),
+      texto: ["Vamos {N} de {META}, gracias a ti 🧡", "Nos faltan {FALTAN}", "¡Nos vemos este fin de semana!"],
+      desc: D("Vamos {N} de {META}, gracias a ti 🧡 Nos faltan {FALTAN}."), fijado: "Cada bolsa cuenta 🙏" }
+  ] }); };
+
+/* ============ Flyer: sorteo ============ */
+FORMATS.flyer_sorteo = function (p) { var fecha = p.fecha || "el domingo"; return FLY({
+  nombre: "Flyer: sorteo de 2 TostiAguachiles", ev: "b", hora: "7 a 9 pm",
+  porque: "Un sorteo sencillo pide compartir y etiquetar, y eso lleva tu cuenta a gente nueva de Texmelucan. Los comentarios también suben el alcance.",
+  subir: "Sube 1 imagen: tu flyer original (con el logo).",
+  necesitas: ["Decide el premio (aquí: 2 TostiAguachiles para quien gane) y la fecha del sorteo.", "Meta obliga a aclarar en la descripción que el sorteo no está patrocinado por Instagram ni Facebook: ya viene incluido en el texto.", "Elige al ganador con una herramienta que escoja al azar, y grábalo para anunciarlo."],
+  v: [
+    { e: "Directo", prompt: REF("el texto principal por «SORTEO: 2 TOSTIAGUACHILES» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte esta publicación · Etiqueta a 2 amigos · Gana " + fecha + "». No agregues más texto."),
+      texto: ["SORTEO: 2 TOSTIAGUACHILES", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana " + fecha],
+      desc: D("🎁 SORTEO: 2 TostiAguachiles Negros\nPara participar: 1) Sigue la cuenta 2) Comparte esta publicación 3) Etiqueta a 2 amigos en los comentarios.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta aquí a tus 2 amigos 👇" },
+    { e: "Con humor", prompt: REF("el texto principal por «TE REGALAMOS DOS AGUACHILES (SÍ, GRATIS)» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte · Etiqueta a 2 amigos · Gana " + fecha + "»."),
+      texto: ["TE REGALAMOS DOS AGUACHILES (SÍ, GRATIS)", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana " + fecha],
+      desc: D("🎁 Te regalamos 2 TostiAguachiles Negros. Sí, gratis. 😅\nPara participar: sigue la cuenta, comparte y etiqueta a 2 amigos.\nElegimos al ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Etiqueta a tu mejor amigo para el aguachile 👇" },
+    { e: "Cercano", prompt: REF("el texto principal por «Queremos regalarte un antojo 🧡» y debajo, en letra más pequeña: «Sigue la cuenta · Comparte · Etiqueta a 2 amigos · Gana 2 TostiAguachiles " + fecha + "»."),
+      texto: ["Queremos regalarte un antojo 🧡", "Sigue la cuenta · Comparte · Etiqueta a 2 amigos", "Gana 2 TostiAguachiles " + fecha],
+      desc: D("Queremos regalarte un antojo 🧡 Sorteo de 2 TostiAguachiles Negros.\nSigue la cuenta, comparte y etiqueta a 2 amigos. Elegimos ganador " + fecha + ".\nEste sorteo no está patrocinado ni administrado por Instagram ni Facebook."), fijado: "Mucha suerte a todos 🍀" }
+  ] }); };
+
+/* ============ Foto: la bolsa en primer plano ============ */
+FORMATS.foto_comp = function () { return FOT({
+  nombre: "Foto: tu TostiAguachile Negro en primer plano", ev: "i", hora: "12 a 2 pm",
+  porque: "En Instagram y Facebook la foto de la bolsa abierta es lo que la gente guarda y comparte (tu foto “Algo bien” tuvo 9 compartidos). Necesitas buena foto para el perfil, Marketplace y los anuncios.",
+  subir: "Sube 1 imagen: tu foto real de la bolsa (no la edites con IA si quedó bien).",
+  necesitas: ["Una bolsa recién armada, con todos los ingredientes bien acomodados.", "Un lugar con luz natural (a un lado del puesto, sin sol directo en la comida)."],
+  v: [
+    { e: "Desde arriba", tomar: "Pon la bolsa abierta sobre una mesa limpia. Párate encima y toma la foto desde arriba, recta. Que se vean el camarón, el pepino, la cebolla morada y el aderezo negro. Deja un poco de espacio libre arriba para escribir.",
+      prompt: "Usa la imagen de referencia (mi foto). No cambies la comida, ni la bolsa, ni los ingredientes, ni el logo. Ahora cámbiale: solo la luz (más natural y cálida) y quita las cosas del fondo que distraigan. Mantén el formato vertical 4:5.",
+      texto: ["TostiAguachile Negro", "{PRECIO} · {LUGAR}"],
+      desc: D("Así se ve un TostiAguachile Negro por dentro 🦐🖤"), fijado: "¿Normal o picante? 👇" },
+    { e: "En la mano", tomar: "Pídele a alguien que te tome la foto, o apóyate en la hielera. Sostén la bolsa con una mano a la altura del pecho, un poco inclinada hacia la cámara, con el tenedor dentro. El fondo debe ser el puesto.",
+      prompt: "Usa la imagen de referencia (mi foto). No cambies la comida, la bolsa, la mano ni el logo. Ahora cámbiale: solo la luz (más natural y cálida) y desenfoca ligeramente el fondo. Mantén el formato vertical 4:5.",
+      texto: ["Hecho al momento", "{LUGAR}"],
+      desc: D("Hecho al momento y con mucho cariño 🧡"), fijado: "Cuéntanos qué le pondrías tú 👇" },
+    { e: "Con el letrero", tomar: "Pon la bolsa servida junto al letrero de {PRECIO}, con el letrero un poco detrás para que se lea bien. Foto a la altura de la mesa (a ras), para que la bolsa se vea grande.",
+      prompt: "Usa la imagen de referencia (mi foto). No cambies la comida, la bolsa, el letrero ni el logo. Ahora cámbiale: solo la luz (más natural y cálida) y quita personas o cosas del fondo que distraigan. Mantén el formato vertical 4:5.",
+      texto: ["{PRECIO}", "Hecho al momento · {LUGAR}"],
+      desc: D("{PRECIO} y hecho al momento 🔥"), fijado: "¿Ya viste nuestro precio? 👇" }
+  ] }); };
+
+/* ============ Historias del viernes (apertura) ============ */
+FORMATS.historias_viernes = function () { return HIS({
+  nombre: "Historias: apertura del día (3 láminas)", ev: "a", hora: "10:30 am, 12 pm y 2 pm",
+  porque: "Las historias son para tus seguidores actuales: les avisan que ya abriste y bastan 10 segundos. Cuestan casi nada de tiempo.",
+  necesitas: ["3 fotos o videos cortos hechos en el momento (el puesto, una bolsa, el letrero).", "El sticker de ubicación y el de pregunta, desde el menú de stickers."],
+  v: [
+    { e: "Directo", lams: [
+      { hora: "10:30 am", mostrar: "Foto o video corto del puesto ya armado, con el letrero de {PRECIO}.", texto: "YA ABRIMOS 🔥", sticker: "Ubicación: {LUGAR}" },
+      { hora: "12 pm", mostrar: "Una bolsa servida, de cerca.", texto: "TostiAguachile Negro · {PRECIO}", sticker: "Pregunta: “¿Normal o picante?”" },
+      { hora: "2 pm", mostrar: "El puesto con gente o con la hielera casi vacía.", texto: "Quedan pocos ⏳ Hasta las 3", sticker: "Ubicación: {LUGAR}" }] },
+    { e: "Con humor", lams: [
+      { hora: "10:30 am", mostrar: "Selfie tuya con cara de “ya llegué”.", texto: "Sí, ya abrí. Sí, hay camarón. 😎", sticker: "Ubicación: {LUGAR}" },
+      { hora: "12 pm", mostrar: "La bolsa servida sostenida cerca de la cámara.", texto: "No lo digo yo, lo dice tu estómago", sticker: "Encuesta: “¿Ya comiste?” Sí / Todavía no" },
+      { hora: "2 pm", mostrar: "La hielera con poco camarón.", texto: "Última llamada ⏳ Quedan pocos", sticker: "Ubicación: {LUGAR}" }] },
+    { e: "Cercano", lams: [
+      { hora: "10:30 am", mostrar: "Tú con una sonrisa, el puesto atrás.", texto: "Buenos días ☀️ Ya estamos aquí", sticker: "Ubicación: {LUGAR}" },
+      { hora: "12 pm", mostrar: "Una bolsa preparándose, plano de tus manos.", texto: "Hecho al momento, con cariño 🧡", sticker: "Pregunta: “¿Qué le pondrías?”" },
+      { hora: "2 pm", mostrar: "Foto de un cliente (con permiso) o del puesto.", texto: "Gracias por venir. Hasta las 3 🙏", sticker: "Ubicación: {LUGAR}" }] }
+  ] }); };
+
+/* ============ Historia: tarjeta de sellos ============ */
+FORMATS.historia_tarjeta = function () { return HIS({
+  nombre: "Historias: la tarjeta de sellos (tu promo)", ev: "i", hora: "2 pm y 7 pm",
+  porque: "Tu promo (10 compras, la siguiente a mitad de precio) hace que vuelvan. Mostrarla en historias a quien ya fue es lo más barato para que regrese.",
+  necesitas: ["La tarjeta de Apple o Google Wallet abierta en un celular (captura de pantalla, sin datos de ningún cliente).", "Una bolsa servida."],
+  v: [
+    { e: "Directo", lams: [
+      { hora: "2 pm", mostrar: "Captura de la tarjeta de sellos con los sellos llenos.", texto: "Pide tu tarjeta de sellos 🎟️", sticker: "Ninguno" },
+      { hora: "2 pm", mostrar: "Texto grande sobre fondo de la marca.", texto: "Empiezas con 2 sellos. A las 10 compras, la siguiente va a mitad de precio.", sticker: "Ninguno" },
+      { hora: "7 pm", mostrar: "Una bolsa servida.", texto: "Pídela en el puesto. Te la hacemos al momento.", sticker: "Ubicación: {LUGAR}" }] },
+    { e: "Con humor", lams: [
+      { hora: "2 pm", mostrar: "Captura de la tarjeta.", texto: "Tu tarjeta de sellos: más fácil que la de la farmacia 😅", sticker: "Ninguno" },
+      { hora: "2 pm", mostrar: "Texto sobre fondo de la marca.", texto: "Empiezas con 2 sellos. Con 10 compras, la siguiente es a mitad de precio.", sticker: "Encuesta: “¿Ya tienes la tuya?” Sí / ¿Qué es eso?" },
+      { hora: "7 pm", mostrar: "Foto de una bolsa servida.", texto: "Tu próximo sello te está esperando", sticker: "Ubicación: {LUGAR}" }] },
+    { e: "Cercano", lams: [
+      { hora: "2 pm", mostrar: "Captura de la tarjeta (sin datos de nadie).", texto: "Queremos darte las gracias por volver 🧡", sticker: "Ninguno" },
+      { hora: "2 pm", mostrar: "Texto sobre fondo de la marca.", texto: "Con tu tarjeta empiezas con 2 sellos. A las 10 compras, la siguiente va a mitad de precio.", sticker: "Ninguno" },
+      { hora: "7 pm", mostrar: "Foto de tu puesto.", texto: "Pide tu tarjeta cuando vengas", sticker: "Ubicación: {LUGAR}" }] }
+  ] }); };
+
+/* ============ Historia: encuesta ============ */
+FORMATS.historia_encuesta = function () { return HIS({
+  nombre: "Historias: encuesta para conocer a tus clientes", ev: "c", hora: "7 a 9 pm",
+  porque: "Las encuestas se contestan con un toque, y te dicen qué quieren: normal o picante, qué ingrediente, si quieren envíos. Es información real para decidir.",
+  necesitas: ["Una foto sencilla (la bolsa) como fondo.", "El sticker de encuesta o de “preguntas” desde el menú de stickers.", "Cuando haya votos, súbelos en una segunda historia: “Ganó X”."],
+  v: [
+    { e: "Directo", lams: [
+      { hora: "7 pm", mostrar: "Foto de la bolsa servida.", texto: "¿Cómo lo quieres?", sticker: "Encuesta: Normal / Picante" },
+      { hora: "7 pm", mostrar: "Foto del puesto.", texto: "¿Te gustaría que lo lleváramos a tu casa?", sticker: "Encuesta: Sí / No" },
+      { hora: "7 pm", mostrar: "Fondo de la marca.", texto: "¿Qué le agregarías al TostiAguachile?", sticker: "Preguntas: caja de respuestas" }] },
+    { e: "Con humor", lams: [
+      { hora: "7 pm", mostrar: "Foto de la bolsa, con cara de “elige”.", texto: "Esto define quién eres: ¿normal o picante?", sticker: "Encuesta: Normal 😇 / Picante 😈" },
+      { hora: "7 pm", mostrar: "Foto del puesto.", texto: "Si te lo llevo a casa, ¿me das propina de aplausos? 👏", sticker: "Encuesta: Sí, claro / Mejor voy" },
+      { hora: "7 pm", mostrar: "Fondo de la marca.", texto: "Dime qué ingrediente le falta (el mejor gana)", sticker: "Preguntas: caja de respuestas" }] },
+    { e: "Cercano", lams: [
+      { hora: "7 pm", mostrar: "Foto de la bolsa servida.", texto: "Cuéntame, ¿cómo te gusta más? 🧡", sticker: "Encuesta: Normal / Picante" },
+      { hora: "7 pm", mostrar: "Foto del puesto.", texto: "¿Te sería útil que llevemos a tu casa o trabajo?", sticker: "Encuesta: Sí / No" },
+      { hora: "7 pm", mostrar: "Fondo de la marca.", texto: "Me ayuda mucho saber qué piensas. ¿Qué le cambiarías?", sticker: "Preguntas: caja de respuestas" }] }
+  ] }); };
+
+/* ============ Marketplace ============ */
+FORMATS.marketplace = function () { return MKT({
+  nombre: "Marketplace: publica tu TostiAguachile Negro", ev: "i", hora: "12 a 2 pm",
+  porque: "En tu zona hay TostiAguachiles en Marketplace entre $100 y $165. El tuyo ($120) está en un rango normal. Pruébalo 2 semanas y decide con los mensajes que recibas.",
+  necesitas: ["3 a 5 fotos (la bolsa de cerca, el puesto, el letrero).", "Que tu perfil de Facebook (no la página) esté a tu nombre y con foto."],
+  v: [
+    { e: "Directo", titulo: "TostiAguachile Negro con camarón fresco", precio: "{PRECIO}", cat: "Comida / Otros",
+      desc: "TostiAguachile Negro: camarón fresco, pepino, cebolla morada, limón, aguacate y nuestro aderezo negro sobre Tostitos (normales o picantes).\n\nHecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nPedidos por WhatsApp: {WA}" },
+    { e: "Con humor", titulo: "Aguachile en bolsa de Tostitos (sí, funciona)", precio: "{PRECIO}", cat: "Comida / Otros",
+      desc: "¿Aguachile en una bolsa de Tostitos? Sí. Y no te lo vas a poder sacar de la cabeza. 😅\n\nCamarón fresco, pepino, cebolla morada y aderezo negro. Hecho al momento.\n📍 {LUGAR}\n🕐 {HORARIO}\nEnvíos en San Martín y Texmelucan centro.\nWhatsApp: {WA}" },
+    { e: "Cercano", titulo: "TostiAguachile Negro, hecho al momento y con cariño", precio: "{PRECIO}", cat: "Comida / Otros",
+      desc: "Hola, somos Aguachiliando 🧡 Preparamos cada TostiAguachile Negro en el momento, con camarón fresco, pepino, cebolla morada y nuestro aderezo negro.\n\nNos encuentras en {LUGAR}, {HORARIO}.\nTambién hacemos envíos en San Martín y Texmelucan centro.\nEscríbenos por WhatsApp: {WA}" }
+  ] }); };
+
+/* ============ Tareas (con textos en 3 estilos cuando hay texto) ============ */
+var TAREAS = {
+  bio: function () { return TAR({
+    nombre: "Corrige la bio de Facebook e Instagram", ev: "t", hora: "Cuando puedas, hoy mismo",
+    porque: "En la bio de Facebook dice “11PM a 3 PM”: quien lea eso pensará que abres de noche. Es lo primero que ve alguien nuevo.",
+    pasos: ["Abre tu página de Facebook → Editar información de la página → Horario.", "Escribe: viernes, sábado y domingo de 11:00 am a 3:00 pm.", "Pega la bio que más te guste (abajo) en Facebook y en Instagram.", "Instagram: Editar perfil → Biografía. Pon el enlace de WhatsApp o de tu página en “Enlaces”."],
+    v: [
+      { e: "Directo", items: [{ lbl: "Bio", txt: "TostiAguachile Negro {PRECIO} 🦐🖤\n📍 {LUGAR}\n🕐 {HORARIO}\n📲 Pedidos y envíos: {WA}" }] },
+      { e: "Con humor", items: [{ lbl: "Bio", txt: "Aguachile en bolsa de Tostitos 🦐 (sí, funciona)\n📍 {LUGAR} · {HORARIO}\n📲 {WA}" }] },
+      { e: "Cercano", items: [{ lbl: "Bio", txt: "Hecho al momento y con cariño 🧡\nTostiAguachile Negro {PRECIO}\n📍 {LUGAR} · {HORARIO}\n📲 {WA}" }] }
+    ] }); },
+  fijar: function () { return TAR({
+    nombre: "Fija el mejor video y ordena los destacados", ev: "t", hora: "Cuando puedas",
+    porque: "Quien entra a tu perfil decide en 3 segundos. Tu mejor video arriba y destacados claros hacen que se queden y te sigan.",
+    pasos: ["TikTok: toca los 3 puntos del video más visto → “Fijar”. Fija hasta 3.", "Instagram: crea destacados con estos nombres: Menú, Ubicación, Tarjeta, Reseñas.", "Facebook: fija la publicación del lanzamiento o la del mejor video."],
+    v: [
+      { e: "Directo", items: [{ lbl: "Destacados", txt: "Menú · Ubicación · Tarjeta · Reseñas" }] },
+      { e: "Con humor", items: [{ lbl: "Destacados", txt: "Lo rico · Dónde estoy · Tarjeta VIP · Dicen de mí" }] },
+      { e: "Cercano", items: [{ lbl: "Destacados", txt: "Nuestro menú · Cómo llegar · Tu tarjeta · Gracias 🧡" }] }
+    ] }); },
+  respuestas: function () { return TAR({
+    nombre: "Prepara respuestas rápidas para mensajes y comentarios", ev: "t", hora: "Cuando puedas",
+    porque: "Cuando alguien comenta “¿dónde están?” y contestas rápido, el video sube y la persona viene. Con estas respuestas ya listas lo haces en 3 segundos.",
+    pasos: ["Copia cada respuesta y guárdala como “respuesta rápida” en WhatsApp Business, o pégala desde aquí cuando la necesites.", "Contesta en menos de una hora cuando puedas."],
+    v: [
+      { e: "Directo", items: [
+        { lbl: "¿Dónde están?", txt: "Estamos {LUGAR}. {HORARIO}." },
+        { lbl: "¿Cuánto cuesta?", txt: "El TostiAguachile Negro cuesta {PRECIO}." },
+        { lbl: "¿Hacen envíos?", txt: "Sí, en San Martín y Texmelucan centro. Pide por WhatsApp: {WA}." },
+        { lbl: "¿Cuándo abren?", txt: "{HORARIO}." }] },
+      { e: "Con humor", items: [
+        { lbl: "¿Dónde están?", txt: "Donde huele a limón y se hace fila 😎 {LUGAR}. {HORARIO}." },
+        { lbl: "¿Cuánto cuesta?", txt: "{PRECIO}. Menos de lo que gastas en pensar qué comer 😅" },
+        { lbl: "¿Hacen envíos?", txt: "Sí, en San Martín y Texmelucan centro. Escríbenos: {WA}." },
+        { lbl: "¿Cuándo abren?", txt: "{HORARIO}. Ve apartando el hambre." }] },
+      { e: "Cercano", items: [
+        { lbl: "¿Dónde están?", txt: "¡Hola! Estamos {LUGAR}. Te esperamos, {HORARIO} 🧡" },
+        { lbl: "¿Cuánto cuesta?", txt: "¡Hola! El TostiAguachile Negro cuesta {PRECIO}. ¿Te animas? 🧡" },
+        { lbl: "¿Hacen envíos?", txt: "¡Sí! Hacemos envíos en San Martín y Texmelucan centro. Escríbenos al {WA} y te ayudamos 🧡" },
+        { lbl: "¿Cuándo abren?", txt: "Abrimos {HORARIO}. ¡Te esperamos! 🧡" }] }
+    ] }); },
+  medir: function () { return TAR({
+    nombre: "Revisa tus números de la semana (10 minutos)", ev: "t", hora: "Lunes, 12 a 2 pm",
+    porque: "Sin números no sabes qué funcionó. Cada semana ves 4 datos y decides qué repetir.",
+    pasos: ["TikTok → Perfil → Herramientas para creadores → Estadísticas. Anota las vistas, el tiempo promedio de visualización, los compartidos y los guardados de cada video.", "Instagram y Facebook → Estadísticas profesionales. Anota lo mismo de cada publicación.", "Encuentra tu mejor video de la semana: ¿qué tenía en los primeros 3 segundos? Haz otro parecido esta semana.", "Encuentra tu peor video: no lo repitas igual, cámbiale el inicio.", "Anota cuánto vendiste cada día de la semana en la app Sellos y compáralo con lo que publicaste ese día."],
+    v: [] }); },
+  planear: function () { return TAR({
+    nombre: "Planea y graba por lote (la forma más fácil)", ev: "t", hora: "Domingo, después de cerrar",
+    porque: "Grabar todo junto un día es más rápido que grabar un video cada día. Con 1 hora tienes los videos de la semana.",
+    pasos: ["Revisa en este calendario los videos de la semana que viene.", "Anota qué clips necesitas de cada uno (están en “Qué necesitas” de cada video).", "Graba los clips cuando abras o cierres el puesto, sin gastar tiempo extra.", "Edita 2 videos el domingo y 2 el lunes, y déjalos listos para publicar."],
+    v: [] }); },
+  mk_revisar: function () { return TAR({
+    nombre: "Marketplace: revisa mensajes y renueva el anuncio", ev: "t", hora: "12 a 2 pm",
+    porque: "Los anuncios de Marketplace se hunden con el tiempo. Renovarlo y responder rápido te mantiene visible.",
+    pasos: ["Abre Marketplace → Tu cuenta → Tus publicaciones.", "Contesta todos los mensajes pendientes.", "Toca “Renovar” o vuelve a publicar con otra foto.", "Anota cuántos mensajes llegaron y cuántos fueron al puesto. Con esto decides si sigues o no."],
+    v: [] }); }
+};
+FORMATS.tareas = function (p) { return TAREAS[p.k](); };
+
+/* =====================================================================
+   EL PLAN: del 18 de noviembre al 17 de diciembre
+   prio: es = esencial · ex = extra · ta = tarea
+   ===================================================================== */
+function I(f, prio, p, hora) { return { f: f, prio: prio, p: p || {}, hora: hora }; }
+DAYS = [
+  { d: "2026-11-18", nota: "Arranque. Hoy anuncias que ya estás aquí y arreglas tu perfil. Si solo tienes tiempo para una cosa: el video de lanzamiento.",
+    items: [I("lanzamiento", "es"), I("tareas", "ta", { k: "bio" }), I("foto_comp", "ex")] },
+  { d: "2026-11-19", nota: "Mañana abres. Avisa hoy para que la gente llegue con antojo.",
+    items: [I("flyer_cuenta", "es", { fecha: "viernes 20 de noviembre" }), I("marketplace", "ex"), I("tareas", "ta", { k: "respuestas" })] },
+  { d: "2026-11-20", nota: "Primer día de venta del plan. Avisa temprano y graba clips mientras trabajas.",
+    items: [I("ya_abrimos", "es", { titulo: "Primer viernes", nota: "Hoy empezamos con todo." }), I("historias_viernes", "es"), I("reto", "ex")] },
+  { d: "2026-11-21", nota: "El día con más gente. Pide permiso para grabar a 3 clientes: te sirve para el domingo y para el lunes.",
+    items: [I("primera_vez", "es"), I("historia_tarjeta", "es"), I("ya_abrimos", "ex", { titulo: "Sábado", nota: "Hoy también estamos aquí." })] },
+  { d: "2026-11-22", nota: "Domingo de antojo: cuando se acabe, lo cuentas. La escasez vende.",
+    items: [I("domingo", "es", { titulo: "Domingo de antojo", nota: "Hoy hasta las 3 o hasta que se acabe." }), I("tareas", "ta", { k: "planear" })] },
+  { d: "2026-11-23", nota: "Lunes de compras y números. Te sirve para mostrar por qué cuesta lo que cuesta.",
+    items: [I("costos", "es"), I("tareas", "ta", { k: "medir" })] },
+  { d: "2026-11-24", nota: "Martes de preparación. Sonido real y primeros planos.",
+    items: [I("asmr", "es", { foco: "picar pepino y exprimir limón" }), I("historia_encuesta", "ex")] },
+  { d: "2026-11-25", nota: "Hoy empieza la serie con meta. Escribe tu meta y tu número en ⚙️ antes de grabar.",
+    items: [I("meta_anuncio", "es"), I("que_lleva", "ex")] },
+  { d: "2026-11-26", nota: "Mañana abres. Hoy también refrescas Marketplace.",
+    items: [I("flyer_cuenta", "es", { fecha: "viernes 27 de noviembre" }), I("tareas", "ta", { k: "fijar" }), I("tareas", "ta", { k: "mk_revisar" })] },
+  { d: "2026-11-27", nota: "Viernes con meta: avisa cómo vas.",
+    items: [I("ya_abrimos", "es", { titulo: "Viernes con meta", nota: "Ya llevamos {N} de {META} 💪" }), I("historias_viernes", "es")] },
+  { d: "2026-11-28", nota: "Sábado: clientes probando. Graba reacciones reales.",
+    items: [I("reacciones", "es"), I("historia_tarjeta", "ex")] },
+  { d: "2026-11-29", nota: "Cierre de la primera semana de la meta.",
+    items: [I("domingo", "es", { titulo: "Domingo de antojo", nota: "Se acabó rápido. Gracias." }), I("avance_meta", "es", { titulo: "Semana 1 de la meta", nota: "Gracias por ayudarnos a llegar." }), I("flyer_contador", "ex"), I("tareas", "ta", { k: "planear" })] },
+  { d: "2026-11-30", nota: "Lunes de números. Revisa qué video funcionó mejor.",
+    items: [I("curiosidad_bolsa", "es"), I("tareas", "ta", { k: "medir" })] },
+  { d: "2026-12-01", nota: "Empieza diciembre. Sonido real otra vez, ahora con el aderezo.",
+    items: [I("asmr", "es", { foco: "echar el aderezo negro" }), I("historia_encuesta", "ex")] },
+  { d: "2026-12-02", nota: "Muestra el trabajo detrás del puesto: da confianza.",
+    items: [I("detras", "es"), I("tareas", "ta", { k: "mk_revisar" })] },
+  { d: "2026-12-03", nota: "Mañana abres y lanzas el sorteo del fin de semana.",
+    items: [I("flyer_cuenta", "es", { fecha: "viernes 4 de diciembre" }), I("flyer_sorteo", "ex", { fecha: "el domingo 6 de diciembre" })] },
+  { d: "2026-12-04", nota: "Viernes de diciembre. Menciona el sorteo en tus historias.",
+    items: [I("ya_abrimos", "es", { titulo: "Primer viernes de diciembre", nota: "Participa en el sorteo 🎁" }), I("historias_viernes", "es")] },
+  { d: "2026-12-05", nota: "Sábado de proceso: muestra cómo salen muchos aguachiles.",
+    items: [I("proceso50", "es"), I("historia_tarjeta", "ex")] },
+  { d: "2026-12-06", nota: "Hoy anuncias al ganador del sorteo (en historias, con una captura del azar). Y cierras la semana 2 de la meta.",
+    items: [I("domingo", "es", { titulo: "Domingo de antojo", nota: "Hoy anunciamos al ganador del sorteo 🎁" }), I("avance_meta", "es", { titulo: "Semana 2 de la meta", nota: "¡Seguimos!" })] },
+  { d: "2026-12-07", nota: "Lunes de números. Mira si el sorteo te trajo seguidores nuevos.",
+    items: [I("curiosidad_voto", "es"), I("tareas", "ta", { k: "medir" })] },
+  { d: "2026-12-08", nota: "Sonido real. Esta vez, lo último que le pones a la bolsa.",
+    items: [I("asmr", "es", { foco: "cortar aguacate y echar ajonjolí" })] },
+  { d: "2026-12-09", nota: "Presentas las charolas para posadas: es tu producto de temporada.",
+    items: [I("flyer_charolas", "es"), I("charola_proceso", "es")] },
+  { d: "2026-12-10", nota: "Mañana abres. Antes del 12, avisa tu horario.",
+    items: [I("flyer_cuenta", "es", { fecha: "viernes 11 de diciembre" }), I("historia_encuesta", "ex"), I("tareas", "ta", { k: "mk_revisar" })] },
+  { d: "2026-12-11", nota: "Avisa si también abres el 12 de diciembre (confirma tu horario).",
+    items: [I("ya_abrimos", "es", { titulo: "Víspera del 12", nota: "Mañana también abrimos." }), I("historias_viernes", "es")] },
+  { d: "2026-12-12", nota: "Fecha local importante. Tono respetuoso y sin bromas con el tema religioso.",
+    items: [I("fecha_local", "es"), I("historia_tarjeta", "ex")] },
+  { d: "2026-12-13", nota: "Cierre de la semana 3 de la meta.",
+    items: [I("domingo", "es", { titulo: "Domingo de antojo", nota: "Gracias por una semana increíble." }), I("avance_meta", "es", { titulo: "Semana 3 de la meta", nota: "Casi llegamos." }), I("flyer_contador", "ex"), I("tareas", "ta", { k: "planear" })] },
+  { d: "2026-12-14", nota: "Resumen de 3 semanas: ya tienes números reales. Úsalos.",
+    items: [I("resumen", "es"), I("tareas", "ta", { k: "medir" })] },
+  { d: "2026-12-15", nota: "Mañana empiezan las posadas. Muestra una charola armada.",
+    items: [I("asmr", "es", { foco: "armar una charola" })] },
+  { d: "2026-12-16", nota: "Empiezan las posadas. Esta semana ofrece charolas y envíos.",
+    items: [I("posada", "es"), I("marketplace", "ex")] },
+  { d: "2026-12-17", nota: "Cierre del plan. Anuncia tu resultado y qué sigue.",
+    items: [I("cierre", "es"), I("flyer_cuenta", "es", { fecha: "viernes 18 de diciembre" })] }
+];
+
+/* =====================================================================
+   LÓGICA
+   ===================================================================== */
+(function () {
+  "use strict";
+  var DEF = { precio: "$120", wa: "248 179 4646", lugar: "frente a la UIEST", horario: "viernes, sábado y domingo de 11 a 3", meta: 150, n: 0 };
+  var LS = "aguachiliando-cal";
+  var st = { cfg: {}, done: {}, es: false };
+  try { var raw = JSON.parse(localStorage.getItem(LS) || "{}"); if (raw && typeof raw === "object") { st.cfg = raw.cfg || {}; st.done = raw.done || {}; st.es = !!raw.es; } } catch (e) {}
+  function save() { try { localStorage.setItem(LS, JSON.stringify({ cfg: st.cfg, done: st.done, es: st.es })); } catch (e) {} }
+  function cfg(k) { var v = st.cfg[k]; return (v === undefined || v === null || v === "") ? DEF[k] : v; }
+
+  var DIAS = ["domingo", "lunes", "martes", "miércoles", "jueves", "viernes", "sábado"];
+  var MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+  var TIPOS = { video: "Video", flyer: "Flyer con IA", foto: "Foto", hist: "Historias", mk: "Marketplace", tarea: "Tarea" };
+  var PRIO = { es: "Esencial", ex: "Extra", ta: "Tarea" };
+  var EVT = { a: "Anuncio", b: "Reto", c: "Pregunta", d: "Proceso", e: "Escasez", f: "Meta", h: "Temporada", i: "Producto", t: "Tarea" };
+  var ICON = {
+    video: '<polygon points="7 4 20 12 7 20"/>',
+    flyer: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>',
+    foto: '<path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/>',
+    hist: '<circle cx="12" cy="12" r="8.5" stroke-dasharray="3 2.4"/><path d="M12 8v8M8 12h8"/>',
+    mk: '<path d="M4 9l1.5-5h13L20 9"/><path d="M4 9v11h16V9"/><path d="M4 9c0 2 4 2 4 0 0 2 4 2 4 0 0 2 4 2 4 0 0 2 4 2 4 0"/>',
+    tarea: '<rect x="4" y="4" width="16" height="16" rx="3"/><path d="M8.5 12.5l2.5 2.5 4.5-5"/>'
+  };
+  function svg(k, cls) { return '<svg class="' + (cls || "i") + '" viewBox="0 0 24 24" aria-hidden="true">' + ICON[k] + "</svg>"; }
+  var OKSVG = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true" style="width:14px;height:14px;stroke-width:2.6"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+  function pd(s) { var a = s.split("-"); return new Date(+a[0], +a[1] - 1, +a[2]); }
+  function iso(d) { return d.getFullYear() + "-" + ("0" + (d.getMonth() + 1)).slice(-2) + "-" + ("0" + d.getDate()).slice(-2); }
+  function cap(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+  function longDate(s) { var d = pd(s); return cap(DIAS[d.getDay()]) + " " + d.getDate() + " de " + MESES[d.getMonth()]; }
+  function isOpen(s) { var w = pd(s).getDay(); return w === 5 || w === 6 || w === 0; }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+
+  function tok(s) {
+    var meta = Math.max(1, parseInt(cfg("meta"), 10) || 1), n = Math.max(0, parseInt(cfg("n"), 10) || 0);
+    var m = { PRECIO: cfg("precio"), WA: cfg("wa"), LUGAR: cfg("lugar"), HORARIO: cfg("horario"), META: meta, N: n, FALTAN: Math.max(0, meta - n), PCT: Math.min(100, Math.round(n / meta * 100)) };
+    return String(s).replace(/\{([A-Z]+)\}/g, function (a, k) { return m.hasOwnProperty(k) ? m[k] : a; });
+  }
+
+  /* piezas de cada día (se construyen una sola vez) */
+  var BY = {}, ORDER = [];
+  DAYS.forEach(function (day) {
+    BY[day.d] = day; ORDER.push(day.d);
+    day.pieces = day.items.map(function (it, i) { var def = FORMATS[it.f](it.p); return { it: it, def: def, key: day.d + "|" + i, i: i, prio: it.prio, hora: it.hora || def.hora }; });
+  });
+  var FIRST = ORDER[0], LAST = ORDER[ORDER.length - 1];
+
+  var $ = function (id) { return document.getElementById(id); };
+  var panel = $("panel"), grid = $("grid"), track = $("track");
+  var S = { day: FIRST, piece: -1, v: 0, month: 10 };
+
+  function visible(day) { return day.pieces.filter(function (p) { return !st.es || p.prio === "es"; }); }
+  function pct(day) { var v = visible(day); if (!v.length) return 0; return v.filter(function (p) { return st.done[p.key]; }).length / v.length; }
+
+  /* ---------- portapapeles ---------- */
+  var COPY = [], toastT = null;
+  function cp(text) { COPY.push(tok(text)); return COPY.length - 1; }
+  function toast(msg) { var t = $("toast"); t.textContent = msg; t.classList.add("on"); clearTimeout(toastT); toastT = setTimeout(function () { t.classList.remove("on"); }, 1700); }
+  function copyText(text) {
+    function fallback() { var ta = document.createElement("textarea"); ta.value = text; ta.setAttribute("readonly", ""); ta.style.cssText = "position:fixed;top:0;left:0;opacity:0"; document.body.appendChild(ta); ta.select(); ta.setSelectionRange(0, text.length); var ok = false; try { ok = document.execCommand("copy"); } catch (e) {} document.body.removeChild(ta); return ok; }
+    if (navigator.clipboard && window.isSecureContext) { return navigator.clipboard.writeText(text).then(function () { return true; }, function () { return fallback(); }); }
+    return Promise.resolve(fallback());
+  }
+  function block(text, cls, lbl) {
+    return (lbl ? '<span class="lbl">' + esc(lbl) + "</span>" : "") + '<button type="button" class="cp ' + (cls || "") + '" data-cp="' + cp(text) + '">' + esc(tok(text)) + "</button>";
+  }
+  var COPYSVG = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h9"/></svg>';
+  function all(text, lbl) { return '<button type="button" class="copyall" data-cp="' + cp(text) + '">' + COPYSVG + esc(lbl) + "</button>"; }
+
+  /* ---------- calendario ---------- */
+  function renderGrid() {
+    var y = 2026, m = S.month, from = m === 10 ? 16 : 1, lead = (new Date(y, m, from).getDay() + 6) % 7;
+    var end = m === 10 ? 30 : 20;                      /* noviembre desde el lunes 16; diciembre hasta el domingo 20 */
+    var html = "", today = iso(new Date()), items = 0, open = 0;
+    for (var b = 0; b < lead; b++) html += '<div class="cell out" aria-hidden="true"></div>';
+    for (var d = from; d <= end; d++) {
+      var s = y + "-" + ("0" + (m + 1)).slice(-2) + "-" + ("0" + d).slice(-2), day = BY[s];
+      if (!day) { html += '<div class="cell out" aria-hidden="true"><div class="top2"><span class="num">' + d + "</span></div></div>"; continue; }
+      var vis = visible(day); items += day.pieces.length; if (isOpen(s)) open++;
+      var cls = "cell" + (s === S.day ? " sel" : "") + (s === today ? " today" : "");
+      html += '<button type="button" class="' + cls + '" data-day="' + s + '" aria-label="' + esc(longDate(s)) + ", " + vis.length + ' piezas"' + (s === S.day ? ' aria-current="date"' : "") + '><div class="top2"><span class="num">' + d + "</span>" + (isOpen(s) ? '<span class="open">Abierto</span>' : "") + "</div>";
+      vis.slice(0, 3).forEach(function (p) { html += '<span class="chip t-' + p.def.t + (st.done[p.key] ? " done" : "") + '"><span>' + esc(shortName(p)) + "</span></span>"; });
+      if (vis.length > 3) html += '<span class="more">+' + (vis.length - 3) + " más</span>";
+      html += "</button>";
+    }
+    grid.innerHTML = html;
+    $("calTitle").textContent = cap(MESES[m]) + " 2026";
+    $("calSub").textContent = items + " piezas en el mes · " + open + " días de venta";
+    $("mNov").setAttribute("aria-pressed", String(m === 10)); $("mDic").setAttribute("aria-pressed", String(m === 11));
+  }
+  function shortName(p) { var n = tok(p.def.nombre).split(":")[0]; return (p.def.t === "hist" ? "Historias" : n).slice(0, 34); }
+
+  function renderTrack() {
+    var h = "";
+    ORDER.forEach(function (s) { var p = pct(BY[s]); h += '<button type="button" role="tab" data-day="' + s + '" class="' + (p >= 1 ? "done " : p > 0 ? "part " : "") + (s === S.day ? "cur" : "") + '" aria-label="' + esc(longDate(s)) + '" aria-selected="' + (s === S.day) + '" title="' + esc(longDate(s)) + '"></button>'; });
+    track.innerHTML = h;
+  }
+  function renderCount() {
+    var t = 0, dn = 0; ORDER.forEach(function (s) { visible(BY[s]).forEach(function (p) { t++; if (st.done[p.key]) dn++; }); });
+    $("cnt").textContent = dn + " / " + t;
+  }
+
+  /* ---------- panel: día ---------- */
+  function pills(arr) { return '<div class="meta">' + arr.filter(Boolean).join("") + "</div>"; }
+  function pill(t, c) { return '<span class="pill' + (c ? " " + c : "") + '">' + esc(t) + "</span>"; }
+
+  function renderDay(go) {
+    var day = BY[S.day], vis = visible(day), i = ORDER.indexOf(S.day), dn = vis.filter(function (p) { return st.done[p.key]; }).length;
+    COPY = [];
+    var h = '<div class="head fade"><div class="meta">' + pill(cap(DIAS[pd(S.day).getDay()]) + " " + pd(S.day).getDate()) + (isOpen(S.day) ? pill("Día de venta", "es") : pill("No abres", "")) + pill(dn + " de " + vis.length + " hechas") + "</div>" +
+      '<h2>' + esc(longDate(S.day)) + "</h2>" +
+      '<div style="display:flex;gap:6px;margin-top:10px"><button type="button" class="copyall" data-nav="-1" ' + (i === 0 ? "disabled" : "") + ">← Día anterior</button><button type=\"button\" class=\"copyall\" data-nav=\"1\" " + (i === ORDER.length - 1 ? "disabled" : "") + ">Día siguiente →</button></div></div>" +
+      '<div class="body fade"><p class="lead">' + esc(tok(day.nota || "")) + "</p>";
+    if (!vis.length) h += '<p class="none">No hay piezas esenciales este día.</p>';
+    h += '<h3>Lo que toca hacer hoy</h3>';
+    vis.forEach(function (p) {
+      var d = p.def, sub = [TIPOS[d.t], p.hora, d.dur].filter(Boolean).join(" · ");
+      h += '<div class="pzrow' + (st.done[p.key] ? " done" : "") + '"><button type="button" class="pz t-' + d.t + '" data-piece="' + p.i + '"><span class="ico">' + svg(d.t) + '</span><span><div class="tt">' + esc(tok(d.nombre)) + '</div><div class="mm">' + esc(sub) + ' · <span class="pill ' + p.prio + '" style="padding:0 7px">' + PRIO[p.prio] + "</span></div></span></button>" +
+        '<button type="button" class="okb" data-done="' + p.i + '" aria-label="Marcar como hecha" aria-pressed="' + !!st.done[p.key] + '"><span class="okmark">' + OKSVG + "</span></button></div>";
+    });
+    h += '<div class="nota db" style="margin-top:14px"><b>Cómo se usa</b><p>Toca una pieza para ver exactamente qué poner. Toca cualquier texto para copiarlo.</p></div></div>';
+    panel.innerHTML = h; if (go) scrollTop(true);
+  }
+
+  /* ---------- panel: pieza ---------- */
+  function renderPiece(go) {
+    var day = BY[S.day], p = day.pieces[S.piece], d = p.def; COPY = [];
+    var v = d.v[Math.min(S.v, d.v.length - 1)] || null;
+    var h = '<div class="head fade"><button type="button" class="back" data-back="1">' + '<svg class="i" viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>' + esc(longDate(S.day)) + "</button>" +
+      pills([pill(TIPOS[d.t]), pill(PRIO[p.prio], p.prio), d.ev ? pill(EVT[d.ev]) : "", p.hora ? pill("🕐 " + p.hora) : "", d.dur ? pill("⏱ " + d.dur) : ""]) +
+      "<h2>" + esc(tok(d.nombre)) + "</h2></div>";
+    if (d.v && d.v.length) {
+      h += '<div class="tabs" role="tablist" aria-label="Opciones">';
+      d.v.forEach(function (x, i) { h += '<button type="button" role="tab" data-v="' + i + '" aria-selected="' + (i === S.v) + '">Opción ' + (i + 1) + ' · ' + esc(x.e) + "</button>"; });
+      h += "</div>";
+    }
+    h += '<div class="body fade">';
+    if (d.subir) h += '<div class="nota db"><b>Qué imágenes subir a la IA</b><p>' + esc(tok(d.subir)) + "</p></div>";
+    if (v) h += variantHtml(d, v);
+    if (d.pasos) {
+      h += '<div class="sec"><h3>Pasos</h3><ul class="check">';
+      d.pasos.forEach(function (t) { h += '<li><input type="checkbox" aria-label="Paso"><span>' + esc(tok(t)) + "</span></li>"; });
+      h += "</ul>" + all(d.pasos.map(function (t, i) { return (i + 1) + ". " + t; }).join("\n"), "Copiar los pasos") + "</div>";
+    }
+    h += '<div class="sec"><h3>Por qué esta pieza</h3><div class="nota"><p>' + esc(tok(d.porque)) + "</p></div></div>";
+    if (d.necesitas && d.necesitas.length) {
+      h += '<div class="sec"><h3>Qué necesitas antes</h3><ul class="check">';
+      d.necesitas.forEach(function (t) { h += '<li><input type="checkbox" aria-label="Preparado"><span>' + esc(tok(t)) + "</span></li>"; });
+      h += "</ul></div>";
+    }
+    if (d.plat) h += '<div class="sec"><h3>Dónde se publica</h3><p class="none" style="color:var(--ink2)">' + esc(d.plat) + "</p></div>";
+    if (d.pie && d.pie.length) {
+      h += '<div class="sec"><h3>Cómo hacerlo bien</h3><div class="nota http"><ul>';
+      d.pie.forEach(function (t) { h += "<li>" + esc(tok(t)) + "</li>"; });
+      h += "</ul></div></div>";
+    }
+    h += '<div class="sec"><button type="button" class="copyall" data-donep="1" style="height:40px;padding:0 16px;font-weight:600">' + (st.done[p.key] ? "✓ Hecha (toca para desmarcar)" : "Marcar como hecha") + "</button></div></div>";
+    panel.innerHTML = h; if (go) scrollTop(true);
+  }
+
+  function variantHtml(d, v) {
+    var h = "", t = d.t;
+    if (t === "video") {
+      var scr = "GANCHO: " + v.gancho + "\nAUDIO: " + v.audio + "\n\n" + v.esc.map(function (s, i) { return "ESCENA " + (i + 1) + " (" + s.dur + ")\nMostrar: " + s.mostrar + "\nDecir: " + s.decir + "\nEn pantalla: " + s.pant; }).join("\n\n") + "\n\nDESCRIPCIÓN:\n" + v.desc;
+      h += '<div class="sec"><h3>Empieza así (primeros 2 segundos)</h3>' + block(v.gancho, "big") + '<span class="lbl">Audio</span><div class="nota"><p>' + esc(tok(v.audio)) + "</p></div>" + all(scr, "Copiar todo el guion") + "</div>";
+      h += '<div class="sec"><h3>Escena por escena</h3>';
+      v.esc.forEach(function (s, i) {
+        h += '<div class="paso"><div class="paso-h"><span class="paso-n">' + (i + 1) + "</span><h4>Escena " + (i + 1) + '</h4><span class="secs">' + esc(s.dur) + "</span></div>" +
+          block(s.mostrar, "", "Qué mostrar") + block(s.decir, "big", "Qué decir (natural, con tus palabras)") + block(s.pant, "", "Texto en pantalla") + "</div>";
+      });
+      h += "</div>" + tail(v);
+    } else if (t === "flyer") {
+      h += '<div class="sec"><h3>Prompt para la IA</h3>' + block(v.prompt, "mono big") + "</div>";
+      h += '<div class="sec"><h3>Texto que debe verse en la imagen</h3>' + v.texto.map(function (x) { return block(x, "big"); }).join("") + all(v.texto.join("\n"), "Copiar todo el texto") + "</div>" + tail(v);
+    } else if (t === "foto") {
+      h += '<div class="sec"><h3>Cómo tomar la foto</h3>' + block(v.tomar, "big") + "</div>";
+      h += '<div class="sec"><h3>Si quieres mejorarla con IA (opcional)</h3><div class="nota db"><p>Sube 1 imagen: tu foto real. Después pega este prompt.</p></div>' + block(v.prompt, "mono") + "</div>";
+      h += '<div class="sec"><h3>Texto sobre la foto</h3>' + v.texto.map(function (x) { return block(x, "big"); }).join("") + "</div>" + tail(v);
+    } else if (t === "hist") {
+      var scr2 = v.lams.map(function (s, i) { return "LÁMINA " + (i + 1) + " (" + s.hora + ")\nMostrar: " + s.mostrar + "\nTexto: " + s.texto + "\nSticker: " + s.sticker; }).join("\n\n");
+      h += '<div class="sec"><h3>Tres láminas</h3>' + all(scr2, "Copiar todo");
+      v.lams.forEach(function (s, i) {
+        h += '<div class="paso"><div class="paso-h"><span class="paso-n">' + (i + 1) + "</span><h4>Lámina " + (i + 1) + '</h4><span class="secs">' + esc(s.hora) + "</span></div>" +
+          block(s.mostrar, "", "Qué mostrar") + block(s.texto, "big", "Texto de la lámina") + block(s.sticker, "", "Sticker") + "</div>";
+      });
+      h += "</div>";
+    } else if (t === "mk") {
+      var all3 = v.titulo + "\n" + v.precio + "\n" + v.cat + "\n\n" + v.desc;
+      h += '<div class="sec"><h3>Anuncio</h3>' + all(all3, "Copiar todo el anuncio") + block(v.titulo, "big", "Título") + block(v.precio, "big", "Precio") + block(v.cat, "", "Categoría") + block(v.desc, "big", "Descripción") + "</div>";
+    } else if (t === "tarea") {
+      h += '<div class="sec"><h3>Textos para copiar</h3>' + v.items.map(function (x) { return block(x.txt, "big", x.lbl); }).join("") + "</div>";
+    }
+    return h;
+  }
+  function tail(v) {
+    var h = "";
+    if (v.desc) h += '<div class="sec"><h3>Descripción para publicar</h3>' + block(v.desc, "big") + "</div>";
+    if (v.fijado) h += '<div class="sec"><h3>Comentario fijado (pégalo tú como primer comentario)</h3>' + block(v.fijado, "big") + "</div>";
+    return h;
+  }
+
+  function scrollTop(force) {
+    var b = panel.querySelector(".body"); if (b) b.scrollTop = 0;
+    if (force && window.matchMedia("(max-width: 999px), (max-height: 559px)").matches) {
+      var top = $("track").closest(".top"), off = top ? top.offsetHeight : 0;
+      window.scrollTo({ top: Math.max(0, panel.getBoundingClientRect().top + window.pageYOffset - off - 8), behavior: "smooth" });
+    }
+  }
+
+  function renderAll(go) { renderGrid(); renderTrack(); renderCount(); if (S.piece < 0) renderDay(go); else renderPiece(go); }
+
+  function selectDay(s, keepMonth) {
+    if (!BY[s]) return;
+    S.day = s; S.piece = -1; S.v = 0;
+    if (!keepMonth) S.month = pd(s).getMonth();
+    try { history.replaceState(null, "", "#" + s); } catch (e) {}
+    renderAll(true);
+  }
+
+  /* ---------- eventos ---------- */
+  document.addEventListener("click", function (ev) {
+    var el = ev.target.closest ? ev.target.closest("[data-cp],[data-day],[data-piece],[data-done],[data-back],[data-v],[data-nav],[data-donep]") : null;
+    if (!el) return;
+    if (el.hasAttribute("data-cp")) {
+      var text = COPY[+el.getAttribute("data-cp")];
+      copyText(text).then(function (ok) {
+        if (ok) { el.classList.add("ok"); setTimeout(function () { el.classList.remove("ok"); }, 900); toast("Copiado ✓"); }
+        else toast("No pude copiar: mantén presionado el texto y copia");
+      });
+    } else if (el.hasAttribute("data-day")) { selectDay(el.getAttribute("data-day")); }
+    else if (el.hasAttribute("data-piece")) { S.piece = +el.getAttribute("data-piece"); S.v = 0; renderPiece(true); }
+    else if (el.hasAttribute("data-done")) { var pc = BY[S.day].pieces[+el.getAttribute("data-done")]; st.done[pc.key] = !st.done[pc.key]; if (!st.done[pc.key]) delete st.done[pc.key]; save(); var sy = panel.querySelector(".body"); var keep = sy ? sy.scrollTop : 0; renderAll(); var nb = panel.querySelector(".body"); if (nb) nb.scrollTop = keep; }
+    else if (el.hasAttribute("data-back")) { S.piece = -1; renderDay(true); }
+    else if (el.hasAttribute("data-v")) { S.v = +el.getAttribute("data-v"); var bt = panel.querySelector(".body"); var tp = bt ? bt.scrollTop : 0; renderPiece(); var nb2 = panel.querySelector(".body"); if (nb2) nb2.scrollTop = tp; }
+    else if (el.hasAttribute("data-nav")) { var j = ORDER.indexOf(S.day) + (+el.getAttribute("data-nav")); if (ORDER[j]) selectDay(ORDER[j]); }
+    else if (el.hasAttribute("data-donep")) { var q = BY[S.day].pieces[S.piece]; st.done[q.key] = !st.done[q.key]; if (!st.done[q.key]) delete st.done[q.key]; save(); renderGrid(); renderTrack(); renderCount(); var b2 = panel.querySelector(".body"), k2 = b2 ? b2.scrollTop : 0; renderPiece(); var b3 = panel.querySelector(".body"); if (b3) b3.scrollTop = k2; toast(st.done[q.key] ? "Marcada como hecha ✓" : "Desmarcada"); }
+  });
+  /* flechas del teclado en el calendario */
+  document.addEventListener("keydown", function (ev) {
+    if (ev.target.closest && ev.target.closest("input,textarea,select,dialog")) return;
+    if (ev.key === "ArrowRight" || ev.key === "ArrowLeft") { var j = ORDER.indexOf(S.day) + (ev.key === "ArrowRight" ? 1 : -1); if (ORDER[j]) { ev.preventDefault(); selectDay(ORDER[j]); } }
+  });
+
+  $("mNov").onclick = function () { S.month = 10; renderGrid(); };
+  $("mDic").onclick = function () { S.month = 11; renderGrid(); };
+  $("goToday").onclick = function () { var t = iso(new Date()); selectDay(BY[t] ? t : (t < FIRST ? FIRST : LAST)); };
+  $("btnEs").onclick = function () { st.es = !st.es; save(); this.setAttribute("aria-pressed", String(st.es)); if (S.piece >= 0 && st.es && BY[S.day].pieces[S.piece].prio !== "es") S.piece = -1; renderAll(); toast(st.es ? "Solo lo esencial" : "Todo el plan"); };
+
+  /* tema */
+  var MOON = '<svg class="i" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>';
+  var SUN = '<svg class="i" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>';
+  function themeBtn() { $("btnTheme").innerHTML = document.documentElement.getAttribute("data-theme") === "dark" ? SUN : MOON; }
+  $("btnTheme").onclick = function () { var n = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark"; document.documentElement.setAttribute("data-theme", n); try { localStorage.setItem("aguachiliando-theme", n); } catch (e) {} themeBtn(); };
+  themeBtn();
+
+  /* mis datos */
+  var dlg = $("dlgSet"), FIELDS = { precio: "sPrecio", wa: "sWa", lugar: "sLugar", horario: "sHorario", meta: "sMeta", n: "sN" };
+  function openDlg() { Object.keys(FIELDS).forEach(function (k) { $(FIELDS[k]).value = cfg(k); }); if (dlg.showModal) dlg.showModal(); else dlg.setAttribute("open", ""); }
+  $("btnSet").onclick = openDlg;
+  $("dsX").onclick = function () { if (dlg.close) dlg.close(); else dlg.removeAttribute("open"); };
+  dlg.addEventListener("click", function (e) { if (e.target === dlg && dlg.close) dlg.close(); });
+  Object.keys(FIELDS).forEach(function (k) {
+    $(FIELDS[k]).addEventListener("input", function () { st.cfg[k] = this.value; save(); renderAll(); });
+  });
+
+  $("btnEs").setAttribute("aria-pressed", String(st.es));
+  var h0 = (location.hash || "").slice(1), t0 = iso(new Date());
+  var start = BY[h0] ? h0 : BY[t0] ? t0 : (t0 > LAST ? LAST : FIRST);
+  S.day = start; S.month = pd(start).getMonth();
+  renderAll();
+})();
+
+</script>
+</body>
+</html>
